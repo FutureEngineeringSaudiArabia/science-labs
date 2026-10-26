@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>معمل السيليكا والثوران</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
+<style>
+/* Layout: one lab sheet — step bar, volcano chamber with controls, observation table, task card */
+:root{
+  --bg:#f3f1ec; --surface:#ffffff; --ink:#1f2328; --muted:#5d6570; --line:#d9d4c9;
+  --sky:#dbe6ec; --rock:#8a7a66; --rock2:#a3927c; --ground:#6f6253;
+  --magma:#d9480f; --magma-soft:#fde7dc; --lavaLo:#ff5a1f; --lavaHi:#c98a6a; --ash:#7c7f86;
+  --plate:#1c5d8c; --ok:#1f7a4d; --ok-soft:#dff1e7; --bad:#b42318; --bad-soft:#fbe4e1;
+  --display:"Readex Pro","IBM Plex Sans Arabic",Tahoma,sans-serif;
+  --body:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#14171b; --surface:#1c2026; --ink:#eceff3; --muted:#a3abb6; --line:#2e343c;
+  --sky:#1a2833; --rock:#6b5f51; --rock2:#7d705f; --ground:#4a4136;
+  --magma:#ff7a3d; --magma-soft:#3b2116; --lavaLo:#ff6a2e; --lavaHi:#d79a7a; --ash:#9a9da4;
+  --plate:#6cb8ef; --ok:#5fd39a; --ok-soft:#173326; --bad:#ff8a7a; --bad-soft:#3a1d1a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14171b; --surface:#1c2026; --ink:#eceff3; --muted:#a3abb6; --line:#2e343c;
+  --sky:#1a2833; --rock:#6b5f51; --rock2:#7d705f; --ground:#4a4136;
+  --magma:#ff7a3d; --magma-soft:#3b2116; --lavaLo:#ff6a2e; --lavaHi:#d79a7a; --ash:#9a9da4;
+  --plate:#6cb8ef; --ok:#5fd39a; --ok-soft:#173326; --bad:#ff8a7a; --bad-soft:#3a1d1a; color-scheme:dark}
+html{direction:rtl}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.7}
+.wrap{max-width:860px;margin:0 auto;padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+header{display:flex;flex-direction:column;gap:4px}
+.eyebrow{font-size:13px;color:var(--muted);letter-spacing:.02em}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(24px,5vw,32px);line-height:1.3;margin:0;text-wrap:balance}
+.steps{display:flex;gap:6px;list-style:none;margin:6px 0 0;padding:0}
+.steps li{flex:1;height:6px;border-radius:3px;background:var(--line)}
+.steps li.done{background:var(--plate)}
+.steps li.now{background:var(--magma)}
+.lab{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+canvas{display:block;width:100%;height:auto;background:var(--sky)}
+.controls{display:flex;flex-direction:column;gap:10px;padding:14px;border-top:1px solid var(--line)}
+.lbl{font-size:14px;color:var(--muted)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.seg button{font:inherit;font-size:15px;background:var(--bg);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:8px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;line-height:1.3}
+.seg button small{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.seg button[aria-pressed="true"]{border-color:var(--magma);background:var(--magma-soft)}
+.seg button.tried::after{content:"✓";font-size:12px;color:var(--ok)}
+.run{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.meter{flex:1;min-width:160px;display:flex;flex-direction:column;gap:4px}
+.bar{height:10px;border-radius:5px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--magma);transition:width .15s linear}
+.tablebox{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:520px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right}
+th{font-weight:600;color:var(--muted);font-size:13px}
+td.empty{color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.card h2{font-family:var(--display);font-weight:500;font-size:20px;margin:0}
+.card p{margin:0;max-width:65ch}
+.opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:right;background:var(--bg);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer}
+.opt:hover{border-color:var(--plate)}
+.opt:focus-visible,.btn:focus-visible,.seg button:focus-visible{outline:3px solid var(--plate);outline-offset:2px}
+.opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.opt[disabled]{cursor:default}
+.btn{font:inherit;font-weight:600;background:var(--magma);color:#fff;border:0;border-radius:10px;padding:12px 18px;cursor:pointer;align-self:flex-start}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.alt{background:var(--plate)}
+.fb{border-radius:10px;padding:10px 14px;font-size:15px}
+.fb.ok{background:var(--ok-soft);color:var(--ok)}
+.fb.no{background:var(--bad-soft);color:var(--bad)}
+.done-card{border:2px solid var(--ok)}
+.code{font-family:var(--display);font-weight:700;font-size:44px;letter-spacing:.15em;direction:ltr;text-align:center;background:var(--ok-soft);color:var(--ok);border-radius:12px;padding:10px;font-variant-numeric:tabular-nums}
+ul.learned{margin:0;padding-inline-start:20px;display:grid;gap:4px}
+.hi{background:var(--magma-soft)}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">علوم الثالث المتوسط · الفصل الثاني: تغيرات الأرض · مسار الإتقان ٢</div>
+    <h1>معمل السيليكا والثوران</h1>
+    <ol class="steps" id="steps" aria-label="مراحل المعمل"><li></li><li></li><li></li><li></li></ol>
+  </header>
+
+  <section class="lab" id="lab">
+    <canvas id="cv" width="600" height="360" aria-label="مقطع في بركان يوضح صعود الصهارة والغازات"></canvas>
+    <div class="controls">
+      <div class="lbl">١. اختاري نسبة السيليكا في الصهارة</div>
+      <div class="seg" id="seg">
+        <button id="s0" data-i="0" aria-pressed="true">منخفضة<small>نحو ٥٠٪</small></button>
+        <button id="s1" data-i="1" aria-pressed="false">متوسطة<small>نحو ٦٠٪</small></button>
+        <button id="s2" data-i="2" aria-pressed="false">مرتفعة<small>نحو ٧٠٪</small></button>
+      </div>
+      <div class="run">
+        <button class="btn" id="go">٢. شغّلي الثوران</button>
+        <div class="meter"><span class="lbl">ضغط الغازات المحتجزة</span><div class="bar"><i id="pbar"></i></div></div>
+      </div>
+    </div>
+    <div class="tablebox">
+      <table>
+        <thead><tr><th>السيليكا</th><th>لزوجة الصهارة</th><th>الغازات</th><th>نوع الثوران</th><th>شكل البركان</th></tr></thead>
+        <tbody id="obs">
+          <tr><td>منخفضة</td><td class="empty" colspan="4">لم تُجرَّب بعد</td></tr>
+          <tr><td>متوسطة</td><td class="empty" colspan="4">لم تُجرَّب بعد</td></tr>
+          <tr><td>مرتفعة</td><td class="empty" colspan="4">لم تُجرَّب بعد</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card" id="task" aria-live="polite"></section>
+</div>
+
+<style>
+.fxglow{position:fixed;inset:0;pointer-events:none;z-index:30;opacity:0}
+.fxglow.ok{box-shadow:inset 0 0 0 6px #2fbf71,inset 0 0 90px 30px rgba(47,191,113,.55);animation:fxg 1s ease-out}
+.fxglow.no{box-shadow:inset 0 0 0 6px #e5484d,inset 0 0 90px 30px rgba(229,72,77,.45);animation:fxg .8s ease-out}
+@keyframes fxg{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
+.fxbadge{position:fixed;left:50%;top:40%;z-index:31;pointer-events:none;font-family:var(--display);font-weight:700;font-size:42px;color:#fff;background:#1f9d5c;padding:8px 30px;border-radius:999px;opacity:0;transform:translate(-50%,-50%) scale(.6)}
+.fxbadge.show{animation:fxb 1.1s ease-out}
+@keyframes fxb{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}35%{transform:translate(-50%,-50%) scale(1)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
+@media (prefers-reduced-motion:reduce){.fxbadge.show{animation:none;opacity:0}.fxglow.ok,.fxglow.no{animation-duration:.01s}}
+.wrap>header{padding-inline-end:110px}
+.sndbtn{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:calc(10px + env(safe-area-inset-left,0px));z-index:20;font:inherit;font-size:14px;background:var(--surface);color:var(--ink);border:1.5px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer}
+.sndbtn:focus-visible{outline:3px solid var(--plate);outline-offset:2px}
+</style>
+<button class="sndbtn" id="sndbtn" aria-pressed="true">الصوت: يعمل</button>
+<script>
+const SFX=(()=>{
+  let ac=null,on=true;
+  const btn=document.getElementById("sndbtn");
+  btn.onclick=()=>{on=!on;btn.setAttribute("aria-pressed",on);btn.textContent=on?"الصوت: يعمل":"الصوت: متوقف";};
+  const A=()=>{if(!on)return null;try{if(!ac)ac=new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();return ac}catch(e){return null}};
+  function tone(f,t0,d,type,vol,f2){const c=A();if(!c)return;const o=c.createOscillator(),g=c.createGain();o.type=type||"sine";o.frequency.setValueAtTime(f,c.currentTime+t0);if(f2)o.frequency.exponentialRampToValueAtTime(f2,c.currentTime+t0+d);g.gain.setValueAtTime(0,c.currentTime+t0);g.gain.linearRampToValueAtTime(vol||.2,c.currentTime+t0+.02);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t0+d);o.connect(g).connect(c.destination);o.start(c.currentTime+t0);o.stop(c.currentTime+t0+d+.05)}
+  function noise(t0,d,vol,fType,fFreq,fEnd){const c=A();if(!c)return;const n=c.sampleRate*d,b=c.createBuffer(1,n,c.sampleRate),x=b.getChannelData(0);for(let i=0;i<n;i++)x[i]=Math.random()*2-1;const s=c.createBufferSource();s.buffer=b;const f=c.createBiquadFilter();f.type=fType||"lowpass";f.frequency.setValueAtTime(fFreq||800,c.currentTime+t0);if(fEnd)f.frequency.exponentialRampToValueAtTime(fEnd,c.currentTime+t0+d);const g=c.createGain();g.gain.setValueAtTime(vol||.3,c.currentTime+t0);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t0+d);s.connect(f).connect(g).connect(c.destination);s.start(c.currentTime+t0)}
+  const fx=document.createElement("div");fx.className="fxglow";fx.setAttribute("aria-hidden","true");document.body.append(fx);
+  const badge=document.createElement("div");badge.className="fxbadge";badge.setAttribute("aria-hidden","true");badge.textContent="ممتاز";document.body.append(badge);
+  function glow(kind){fx.className="fxglow";badge.className="fxbadge";void fx.offsetWidth;fx.className="fxglow "+kind;if(kind==="ok"){void badge.offsetWidth;badge.className="fxbadge show"}}
+  const ding=()=>{tone(1318,0,.7,"sine",.22);tone(2637,0,.35,"sine",.06)};
+  const buzz=()=>{tone(150,0,.28,"square",.07,120)};
+  return{
+    good(){glow("ok");ding()},
+    bad(){glow("no");buzz()},
+    win(){glow("ok");ding();setTimeout(()=>tone(1568,0,.8,"sine",.2),220)},
+    tick(){tone(880,0,.08,"sine",.1)},
+    rumble(d,vol){noise(0,d||2,vol||.5,"lowpass",140,60)},
+    boom(){noise(0,2.5,1,"lowpass",900,40);tone(70,0,1.4,"sine",.6,30)},
+    bubble(){for(let i=0;i<10;i++)tone(300+Math.random()*500,i*.12+Math.random()*.05,.08,"sine",.07,700+Math.random()*400)},
+    hiss(d){noise(0,d||1.5,.15,"highpass",3000)},
+    whoosh(){noise(0,.6,.25,"bandpass",400,2400)},
+    thud(){tone(110,0,.25,"sine",.35,50)},
+  };
+})();
+</script>
+
+<script>
+const CODE="3958";
+const LV=[
+ {name:"منخفضة",visc:"منخفضة، تنساب بسهولة",gas:"تخرج بسهولة",erupt:"هادئ، تنساب اللابة",shape:"درعي، واسع ومنحدراته خفيفة",hw:265,h:70,bub:2.4,flow:1.1},
+ {name:"متوسطة",visc:"متوسطة",gas:"يحتجز بعضها",erupt:"متوسط القوة",shape:"مخروطي",hw:175,h:135,bub:1.0,flow:.55},
+ {name:"مرتفعة",visc:"مرتفعة، سميكة بطيئة",gas:"تبقى محتجزة",erupt:"انفجاري قوي",shape:"مركّب، منحدراته حادة",hw:150,h:170,bub:.35,flow:.15}
+];
+const cv=document.getElementById("cv"),ctx=cv.getContext("2d");
+const W=600,H=360,GY=300;
+function fitDPR(){const r=window.devicePixelRatio||1;cv.width=W*r;cv.height=H*r;ctx.setTransform(r,0,0,r,0,0)}
+fitDPR();
+const C={};function readC(){const s=getComputedStyle(document.documentElement);["sky","rock","rock2","ground","lavaLo","lavaHi","ash","ink","muted","surface"].forEach(k=>C[k]=s.getPropertyValue("--"+k).trim())}
+readC();matchMedia("(prefers-color-scheme: dark)").addEventListener("change",()=>{readC();if(!running)draw()});
+
+let sel=0,running=false,t=0,pressure=0,bubbles=[],ash=[],flow=0,exploded=false,tried=new Set(),shake=0,flash=0,lastBlast=0;
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+function lerpC(a,b,k){const pa=hex(a),pb=hex(b);return `rgb(${pa.map((v,i)=>Math.round(v+(pb[i]-v)*k)).join(",")})`}
+function hex(c){c=c.replace("#","");if(c.length===3)c=[...c].map(x=>x+x).join("");return[0,2,4].map(i=>parseInt(c.substr(i,2),16))}
+function lavaCol(){return lerpC(C.lavaLo,C.lavaHi,sel/2)}
+
+function volcanoPath(L){const cx=W/2;ctx.beginPath();ctx.moveTo(cx-L.hw,GY);ctx.quadraticCurveTo(cx-L.hw*.35,GY-L.h*.95,cx-14,GY-L.h);ctx.lineTo(cx+14,GY-L.h);ctx.quadraticCurveTo(cx+L.hw*.35,GY-L.h*.95,cx+L.hw,GY);ctx.closePath()}
+function flankPoint(L,side,k){/* point along flank from summit (k=0) to base (k=1) */const cx=W/2,x0=cx+side*14,y0=GY-L.h,x2=cx+side*L.hw,y2=GY,x1=cx+side*L.hw*.35,y1=GY-L.h*.95;const u=1-k;return[u*u*x0+2*u*k*x1+k*k*x2,u*u*y0+2*u*k*y1+k*k*y2]}
+
+function draw(){
+  const L=LV[sel],cx=W/2;
+  ctx.setTransform(1,0,0,1,0,0);const r0=window.devicePixelRatio||1;ctx.setTransform(r0,0,0,r0,shake?(Math.random()-.5)*shake*.35*r0:0,shake?(Math.random()-.5)*shake*.35*r0:0);
+  ctx.clearRect(-20,-20,W+40,H+40);ctx.fillStyle=C.sky;ctx.fillRect(-20,-20,W+40,H+40);
+  /* ground cross-section */
+  ctx.fillStyle=C.ground;ctx.fillRect(0,GY,W,H-GY);
+  /* magma chamber */
+  ctx.fillStyle=lavaCol();ctx.beginPath();ctx.ellipse(cx,GY+32,70,17,0,0,Math.PI*2);ctx.fill();
+  /* volcano body */
+  volcanoPath(L);ctx.fillStyle=C.rock;ctx.fill();
+  if(sel===2){ctx.save();volcanoPath(L);ctx.clip();ctx.strokeStyle=C.rock2;ctx.lineWidth=7;for(let i=1;i<6;i++){ctx.beginPath();ctx.moveTo(cx-L.hw,GY-i*L.h/6+10);ctx.lineTo(cx-10,GY-L.h-10+i*L.h/6);ctx.lineTo(cx+L.hw,GY-i*L.h/6+10);ctx.stroke()}ctx.restore()}
+  /* conduit */
+  ctx.fillStyle=lavaCol();ctx.fillRect(cx-7,GY-L.h,14,L.h+20);
+  /* plug for high silica */
+  if(sel===2&&!exploded){ctx.fillStyle=C.rock2;ctx.fillRect(cx-9,GY-L.h-2,18,14)}
+  if(sel===2&&exploded){ctx.fillStyle=C.sky;ctx.beginPath();ctx.moveTo(cx-34,GY-L.h-2);ctx.lineTo(cx+34,GY-L.h-2);ctx.lineTo(cx+10,GY-L.h+22);ctx.lineTo(cx-10,GY-L.h+22);ctx.closePath();ctx.fill();ctx.fillStyle=lavaCol();ctx.fillRect(cx-10,GY-L.h+14,20,10)}
+  /* bubbles */
+  ctx.fillStyle=C.surface;bubbles.forEach(b=>{ctx.globalAlpha=.85;ctx.beginPath();ctx.arc(cx+b.x,b.y,b.r,0,Math.PI*2);ctx.fill()});ctx.globalAlpha=1;
+  /* lava flows */
+  if(flow>0){ctx.strokeStyle=lavaCol();ctx.lineCap="round";ctx.lineWidth=sel===0?9:sel===1?7:5;[-1,1].forEach(sd=>{ctx.beginPath();for(let k=0;k<=flow;k+=.02){const p=flankPoint(L,sd,k);k===0?ctx.moveTo(p[0],p[1]-3):ctx.lineTo(p[0],p[1]-3)}ctx.stroke()})}
+  /* ash & bombs */
+  ash.forEach(a=>{ctx.globalAlpha=Math.min(1,Math.max(0,a.life))*(a.k==="b"?1:.8);ctx.fillStyle=a.c;ctx.beginPath();ctx.arc(a.x,a.y,a.r,0,Math.PI*2);ctx.fill()});ctx.globalAlpha=1;
+  if(flash>0){ctx.globalAlpha=flash*.6;ctx.fillStyle="#fff3c4";ctx.fillRect(-20,-20,W+40,H+40);ctx.globalAlpha=1}
+  /* labels */
+  ctx.fillStyle=C.ink;ctx.font="600 15px "+getComputedStyle(document.body).fontFamily;ctx.textAlign="center";
+  ctx.textAlign="right";ctx.fillText("حجرة الصهارة",cx-80,GY+38);
+  ctx.textAlign="left";ctx.fillStyle=C.muted;ctx.font="13px "+getComputedStyle(document.body).fontFamily;ctx.fillText("● فقاعات غاز",14,24);
+}
+
+function spawnBubble(){bubbles.push({x:(Math.random()-.5)*8,y:GY+24,r:2+Math.random()*2.5})}
+function surfY(L,x){const cx=W/2,d=Math.abs(x-cx);if(d<=14)return GY-L.h;if(d>=L.hw)return GY;let lo=0,hi=1;const side=x<cx?-1:1;for(let i=0;i<18;i++){const m=(lo+hi)/2;flankPoint(L,side,m)[0]*side<x*side?lo=m:hi=m}return flankPoint(L,side,lo)[1]}
+function P(o){ash.push(Object.assign({life:1,c:C.ash},o))}
+function step(){
+  const L=LV[sel],top=GY-L.h,cx=W/2;t++;
+  if(t<260&&t%3===0)spawnBubble();
+  bubbles.forEach(b=>{b.y-=L.bub*(.7+Math.random()*.6);if(sel===2&&!exploded&&b.y<top+14){b.y=top+14+Math.random()*(L.h*.5)}});
+  if(sel===2&&!exploded){pressure=Math.min(1,pressure+.0055)}
+  else if(sel===2){pressure=Math.max(.1,pressure-.006)}
+  else if(sel===1){pressure=Math.min(.55,pressure+.004)}else{pressure=Math.min(.12,pressure+.002)}
+  bubbles=bubbles.filter(b=>b.y>=top-4);
+  /* low silica: gentle lava fountain + long flows */
+  if(sel===0&&t>30){flow=Math.min(1,flow+.009);if(t%2===0)P({k:"b",x:cx,y:top,vx:(Math.random()-.5)*1.6,vy:-2.2-Math.random()*1.8,r:2.5,c:lavaCol()})}
+  /* medium: ash puffs and moderate fountain */
+  if(sel===1&&t>60){flow=Math.min(.5,flow+.004);if(t%2===0)P({k:"a",x:cx+(Math.random()-.5)*10,y:top,vx:(Math.random()-.5)*1.5,vy:-3-Math.random()*3,r:4+Math.random()*5});if(t%4===0)P({k:"b",x:cx,y:top,vx:(Math.random()-.5)*3,vy:-3.5-Math.random()*2.5,r:2.8,c:lavaCol()})}
+  /* high: explosion */
+  if(sel===2&&!exploded&&pressure>=1){exploded=true;bubbles=[];shake=55;flash=1;SFX.boom();setTimeout(()=>SFX.rumble(3,.6),300);
+    for(let i=0;i<70;i++)P({k:"b",x:cx+(Math.random()-.5)*16,y:top,vx:(Math.random()-.5)*9,vy:-5-Math.random()*8,r:3+Math.random()*2.5,c:Math.random()<.6?lavaCol():C.rock2,life:1.6});
+    for(let i=0;i<260;i++)P({k:"a",x:cx+(Math.random()-.5)*24,y:top-Math.random()*10,vx:(Math.random()-.5)*6,vy:-6-Math.random()*10,r:5+Math.random()*12,life:1.6});
+  }
+  if(sel===2&&exploded&&t%1===0&&t<lastBlast){for(let i=0;i<3;i++)P({k:"a",x:cx+(Math.random()-.5)*26,y:top,vx:(Math.random()-.5)*3.5,vy:-6-Math.random()*6,r:6+Math.random()*10,life:1.5})}
+  if(sel===2&&exploded&&t<lastBlast&&t%3===0){[-1,1].forEach(sd=>P({k:"p",side:sd,x:cx+sd*16,y:top,vx:sd*(1.6+Math.random()*1.6),r:6+Math.random()*6,life:1.3}))}
+  if(exploded)flow=Math.min(.15,flow+.002);
+  ash.forEach(a=>{
+    if(a.k==="b"){a.x+=a.vx;a.y+=a.vy;a.vy+=.16;a.life-=.004}
+    else if(a.k==="p"){a.x+=a.vx;a.vx*=.995;a.y=surfY(L,a.x)-a.r*.55;a.r+=.12;a.life-=.007}
+    else{a.x+=a.vx;a.y+=a.vy;a.vy*=.965;a.vx*=.985;a.vy-=.02;if(a.y<34){a.vy=Math.max(a.vy,0);a.vx+=(a.x<cx?-1:1)*.06}a.r+=.09;a.life-=.0045}
+  });
+  ash=ash.filter(a=>a.life>0&&a.y<GY+4&&a.x>-60&&a.x<W+60);
+  if(shake>0)shake--;if(flash>0)flash=Math.max(0,flash-.04);
+  document.getElementById("pbar").style.width=(pressure*100)+"%";
+}
+function reset(){t=0;pressure=0;bubbles=[];ash=[];flow=0;exploded=false;shake=0;flash=0;document.getElementById("pbar").style.width="0%";draw()}
+function finishRun(){
+  running=false;document.getElementById("go").disabled=false;document.getElementById("go").textContent="٢. شغّلي الثوران مرة أخرى";
+  const L=LV[sel],row=document.getElementById("obs").children[sel];
+  row.innerHTML=`<td>${L.name}</td><td>${L.visc}</td><td>${L.gas}</td><td>${L.erupt}</td><td>${L.shape}</td>`;row.classList.add("hi");setTimeout(()=>row.classList.remove("hi"),1200);
+  tried.add(sel);document.getElementById("s"+sel).classList.add("tried");
+  if(stage===0)updateGate();
+}
+function run(){
+  if(running)return;reset();running=true;if(sel===0){SFX.bubble();SFX.rumble(2.5,.3)}else if(sel===1){SFX.rumble(3.5,.5);setTimeout(()=>SFX.hiss(2.5),1200)}else{SFX.rumble(3.2,.45);setTimeout(SFX.bubble,600)}document.getElementById("go").disabled=true;
+  if(reduce){for(let i=0;i<420;i++)step();draw();finishRun();return}
+  const dur=sel===2?560:320;lastBlast=sel===2?330:0;
+  (function loop(){step();draw();if(t<dur)requestAnimationFrame(loop);else finishRun()})();
+}
+document.querySelectorAll("#seg button").forEach(b=>b.onclick=()=>{if(running)return;sel=+b.dataset.i;document.querySelectorAll("#seg button").forEach(x=>x.setAttribute("aria-pressed",x===b?"true":"false"));reset()});
+document.getElementById("go").onclick=run;
+draw();
+
+/* tasks */
+const task=document.getElementById("task"),stepsEl=[...document.querySelectorAll("#steps li")];
+let stage=0;
+function setStep(i){stage=i;stepsEl.forEach((li,k)=>{li.className=k<i?"done":k===i?"now":""})}
+function el(h){const tp=document.createElement("template");tp.innerHTML=h.trim();return tp.content}
+function quiz(title,text,opts,right,hint,ok,next,extra){
+  task.replaceChildren(el(`<h2>${title}</h2><p>${text}</p><div class="xtra"></div><div class="opts">${opts.map((o,i)=>`<button class="opt" id="q${i}" data-i="${i}">${o}</button>`).join("")}</div><div class="fb" hidden></div>`));
+  const fb=task.querySelector(".fb"),xt=task.querySelector(".xtra");if(extra)xt.append(extra);else xt.remove();
+  task.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    if(+b.dataset.i===right){SFX.good();task.querySelectorAll(".opt").forEach(x=>x.disabled=true);b.classList.add("right");fb.hidden=false;fb.className="fb ok";fb.textContent=ok;
+      const n=document.createElement("button");n.className="btn";n.textContent="التالي";n.onclick=next;task.append(n);n.focus()}
+    else{SFX.bad();b.classList.add("wrong");b.disabled=true;fb.hidden=false;fb.className="fb no";fb.textContent=hint}
+  });
+}
+function updateGate(){const n=tried.size;const g=document.getElementById("gate");if(!g)return;g.textContent=`جرّبتِ ${"٠١٢٣"[n]} من ٣ نسب`;document.getElementById("next1").disabled=n<3}
+function stage1(){
+  setStep(0);
+  task.replaceChildren(el(`<h2>المرحلة الأولى: جرّبي</h2><p>شغّلي الثوران ثلاث مرات: مرة بسيليكا منخفضة، ومرة متوسطة، ومرة مرتفعة. راقبي فقاعات الغاز وحركة الصهارة ومؤشر الضغط، وستُسجَّل ملاحظاتك في الجدول تلقائياً.</p><p class="lbl" id="gate">جرّبتِ ٠ من ٣ نسب</p><button class="btn" id="next1" disabled>التالي</button>`));
+  document.getElementById("next1").onclick=stage2;updateGate();
+}
+function stage2(){
+  setStep(1);
+  quiz("المرحلة الثانية: استنتجي","في المعمل، عند أي نسبة سيليكا احتُجزت فقاعات الغاز حتى ارتفع الضغط وانفجر البركان؟",
+   ["منخفضة","متوسطة","مرتفعة"],2,"راجعي الجدول: في أي تجربة امتلأ مؤشر الضغط وخرج الرماد بقوة؟","صحيح! السيليكا تجعل الصهارة لزجة، فتحتجز الغازات حتى تنفجر.",
+   ()=>quiz("المرحلة الثانية: استنتجي","أكملي العلاقة: كلما زادت نسبة السيليكا في الصهارة…",
+     ["قلّت لزوجتها وأصبح ثورانها هادئاً","زادت لزوجتها وأصبح ثورانها انفجارياً","لا تتغير لزوجتها"],1,"تذكّري كيف كانت حركة الصهارة في تجربة السيليكا المرتفعة.","أحسنتِ! السيليكا المرتفعة ← لزوجة عالية ← غازات محتجزة ← ثوران انفجاري.",stage3));
+}
+const DATA=[["كراكاتوا، إندونيسيا ١٨٨٣م","مرتفع","مرتفعة"],["كاتماي، ألاسكا ١٩١٢م","مرتفع","مرتفعة"],["باريكوتين، المكسيك ١٩٤٣م","مرتفع","متوسطة"],["هيلجافيل، أيسلندا ١٩٧٣م","منخفض","متوسطة"],["هيلينز، واشنطن ١٩٨٠م","مرتفع","مرتفعة"],["كيلاوا، هاواي ١٩٨٩م","منخفض","منخفضة"],["سوفرير، مونتسرات ١٩٩٥م","مرتفع","مرتفعة"]];
+function stage3(){
+  setStep(2);
+  const tbl=hide=>el(`<div class="tablebox"><table style="min-width:0;font-size:13px"><thead><tr><th>البركان (السنة)</th><th>محتوى السيليكا</th><th>قوة الثوران</th></tr></thead><tbody>${DATA.map((r,i)=>`<tr${i===hide?' class="hi"':''}><td>${r[0]}</td><td>${r[1]}</td><td>${i===hide?'<strong>؟</strong>':r[2]}</td></tr>`).join("")}</tbody></table></div>`);
+  quiz("المرحلة الثالثة: حلّلي البيانات","هذه بيانات حقيقية لسبعة ثورانات من الجدول ٢ في كتابك. بركان كيلاوا في هاواي محتوى السيليكا فيه منخفض. ماذا تتوقعين لقوة ثورانه؟",
+   ["مرتفعة","منخفضة","لا يمكن التوقع"],1,"ارجعي إلى المعمل: ماذا حدث عند السيليكا المنخفضة؟","صحيح! والجدول يؤكد ذلك: كيلاوا ثورانه منخفض القوة، وبراكينه درعية.",
+   ()=>quiz("المرحلة الثالثة: حلّلي البيانات","انظري إلى الثورانات ذات القوة المرتفعة في الجدول. ما المشترك بينها في محتوى السيليكا؟",
+     ["كلها محتوى السيليكا فيها مرتفع","كلها محتوى السيليكا فيها منخفض","تختلف ولا يوجد نمط"],0,"تتبعي صفوف «مرتفعة» في عمود قوة الثوران، ثم انظري إلى عمود السيليكا.","أحسنتِ! البيانات الحقيقية تؤكد ما شاهدتِه في المعمل.",stage4,tbl(-1)),tbl(5));
+}
+function stage4(){
+  setStep(3);
+  quiz("المرحلة الرابعة: من بلادي","حرة رهط قرب المدينة المنورة تكوّنت من ثوران الشقوق، وفيه تنساب اللابة البازلتية فوق سطح الأرض مكوّنة هضاباً واسعة. ما الذي تتوقعينه عن صهارتها؟",
+   ["قليلة السيليكا، فثورانها هادئ وتنساب لابتها","غنية بالسيليكا، فثورانها انفجاري","لا تحتوي على غازات"],0,"اللابة التي تنساب بسهولة وتنتشر على مساحات واسعة… كيف تكون لزوجتها؟","صحيح! اللابة البازلتية قليلة السيليكا قليلة اللزوجة، فتنساب لمسافات بعيدة.",finish);
+}
+function finish(){
+  SFX.win();
+  stepsEl.forEach(li=>li.className="done");task.classList.add("done-card");
+  task.replaceChildren(el(`<h2>أنهيتِ المعمل</h2><p>رمز الإنجاز الخاص بهذا المعمل:</p><div class="code">${CODE}</div><p>عودي إلى النموذج واكتبي هذا الرمز، ثم أجيبي عن أسئلة التحقق.</p><h2>ما تعلمتِه</h2><ul class="learned"><li>السيليكا تزيد لزوجة الصهارة.</li><li>الصهارة اللزجة تحتجز الغازات، فيرتفع الضغط ويكون الثوران انفجارياً.</li><li>الصهارة البازلتية قليلة السيليكا تنساب بهدوء وتكوّن براكين درعية أو هضاباً بازلتية مثل حرة رهط.</li></ul>`));
+}
+stage1();
+</script>

@@ -1,0 +1,320 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>معمل الموجات الزلزالية</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
+<style>
+/* Layout: one lab sheet — step bar, volcano chamber with controls, observation table, task card */
+:root{
+  --bg:#f3f1ec; --surface:#ffffff; --ink:#1f2328; --muted:#5d6570; --line:#d9d4c9;
+  --sky:#dbe6ec; --rock:#8a7a66; --rock2:#a3927c; --ground:#6f6253;
+  --magma:#d9480f; --magma-soft:#fde7dc; --lavaLo:#ff5a1f; --lavaHi:#c98a6a; --ash:#7c7f86;
+  --plate:#1c5d8c; --ok:#1f7a4d; --ok-soft:#dff1e7; --bad:#b42318; --bad-soft:#fbe4e1;
+  --display:"Readex Pro","IBM Plex Sans Arabic",Tahoma,sans-serif;
+  --body:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#14171b; --surface:#1c2026; --ink:#eceff3; --muted:#a3abb6; --line:#2e343c;
+  --sky:#1a2833; --rock:#6b5f51; --rock2:#7d705f; --ground:#4a4136;
+  --magma:#ff7a3d; --magma-soft:#3b2116; --lavaLo:#ff6a2e; --lavaHi:#d79a7a; --ash:#9a9da4;
+  --plate:#6cb8ef; --ok:#5fd39a; --ok-soft:#173326; --bad:#ff8a7a; --bad-soft:#3a1d1a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14171b; --surface:#1c2026; --ink:#eceff3; --muted:#a3abb6; --line:#2e343c;
+  --sky:#1a2833; --rock:#6b5f51; --rock2:#7d705f; --ground:#4a4136;
+  --magma:#ff7a3d; --magma-soft:#3b2116; --lavaLo:#ff6a2e; --lavaHi:#d79a7a; --ash:#9a9da4;
+  --plate:#6cb8ef; --ok:#5fd39a; --ok-soft:#173326; --bad:#ff8a7a; --bad-soft:#3a1d1a; color-scheme:dark}
+html{direction:rtl}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.7}
+.wrap{max-width:860px;margin:0 auto;padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+header{display:flex;flex-direction:column;gap:4px}
+.eyebrow{font-size:13px;color:var(--muted);letter-spacing:.02em}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(24px,5vw,32px);line-height:1.3;margin:0;text-wrap:balance}
+.steps{display:flex;gap:6px;list-style:none;margin:6px 0 0;padding:0}
+.steps li{flex:1;height:6px;border-radius:3px;background:var(--line)}
+.steps li.done{background:var(--plate)}
+.steps li.now{background:var(--magma)}
+.lab{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+canvas{display:block;width:100%;height:auto;background:var(--sky)}
+.controls{display:flex;flex-direction:column;gap:10px;padding:14px;border-top:1px solid var(--line)}
+.lbl{font-size:14px;color:var(--muted)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.seg button{font:inherit;font-size:15px;background:var(--bg);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:8px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;line-height:1.3}
+.seg button small{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.seg button[aria-pressed="true"]{border-color:var(--magma);background:var(--magma-soft)}
+.seg button.tried::after{content:"✓";font-size:12px;color:var(--ok)}
+.run{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.meter{flex:1;min-width:160px;display:flex;flex-direction:column;gap:4px}
+.bar{height:10px;border-radius:5px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--magma);transition:width .15s linear}
+.tablebox{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:520px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right}
+th{font-weight:600;color:var(--muted);font-size:13px}
+td.empty{color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.card h2{font-family:var(--display);font-weight:500;font-size:20px;margin:0}
+.card p{margin:0;max-width:65ch}
+.opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:right;background:var(--bg);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer}
+.opt:hover{border-color:var(--plate)}
+.opt:focus-visible,.btn:focus-visible,.seg button:focus-visible{outline:3px solid var(--plate);outline-offset:2px}
+.opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.opt[disabled]{cursor:default}
+.btn{font:inherit;font-weight:600;background:var(--magma);color:#fff;border:0;border-radius:10px;padding:12px 18px;cursor:pointer;align-self:flex-start}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.alt{background:var(--plate)}
+.fb{border-radius:10px;padding:10px 14px;font-size:15px}
+.fb.ok{background:var(--ok-soft);color:var(--ok)}
+.fb.no{background:var(--bad-soft);color:var(--bad)}
+.done-card{border:2px solid var(--ok)}
+.code{font-family:var(--display);font-weight:700;font-size:44px;letter-spacing:.15em;direction:ltr;text-align:center;background:var(--ok-soft);color:var(--ok);border-radius:12px;padding:10px;font-variant-numeric:tabular-nums}
+ul.learned{margin:0;padding-inline-start:20px;display:grid;gap:4px}
+.hi{background:var(--magma-soft)}
+</style>
+<style>
+:root{--crust:#8a7a66;--mantle:#d98b3a;--outer:#f0c24b;--inner:#f6e7a8;--pw:#1c5d8c;--sw:#c2255c}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--crust:#7d705f;--mantle:#b8732f;--outer:#d6a93c;--inner:#e7d491;--pw:#6cb8ef;--sw:#ff6b9a}}
+:root[data-theme="dark"]{--crust:#7d705f;--mantle:#b8732f;--outer:#d6a93c;--inner:#e7d491;--pw:#6cb8ef;--sw:#ff6b9a}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.btn.p{background:var(--pw)}.btn.s{background:var(--sw)}.btn.g{background:var(--muted)}
+.key{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:13px;color:var(--muted)}
+.key span{display:inline-flex;align-items:center;gap:6px}
+.key i{width:16px;height:4px;border-radius:2px;display:inline-block}
+.readout{font-family:var(--display);font-size:15px;font-variant-numeric:tabular-nums;color:var(--ink)}
+</style>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">علوم الثالث المتوسط · الفصل الثاني: تغيرات الأرض · مسار الإتقان ٣</div>
+    <h1>معمل الموجات الزلزالية</h1>
+    <ol class="steps" id="steps" aria-label="مراحل المعمل"><li></li><li></li><li></li><li></li></ol>
+  </header>
+
+  <section class="lab">
+    <canvas id="cv" width="600" height="400" aria-label="مشهد تفاعلي للموجات الزلزالية"></canvas>
+    <div class="controls" id="ctl"></div>
+  </section>
+
+  <section class="card" id="task" aria-live="polite"></section>
+</div>
+
+<style>
+.fxglow{position:fixed;inset:0;pointer-events:none;z-index:30;opacity:0}
+.fxglow.ok{box-shadow:inset 0 0 0 6px #2fbf71,inset 0 0 90px 30px rgba(47,191,113,.55);animation:fxg 1s ease-out}
+.fxglow.no{box-shadow:inset 0 0 0 6px #e5484d,inset 0 0 90px 30px rgba(229,72,77,.45);animation:fxg .8s ease-out}
+@keyframes fxg{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
+.fxbadge{position:fixed;left:50%;top:40%;z-index:31;pointer-events:none;font-family:var(--display);font-weight:700;font-size:42px;color:#fff;background:#1f9d5c;padding:8px 30px;border-radius:999px;opacity:0;transform:translate(-50%,-50%) scale(.6)}
+.fxbadge.show{animation:fxb 1.1s ease-out}
+@keyframes fxb{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}35%{transform:translate(-50%,-50%) scale(1)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
+@media (prefers-reduced-motion:reduce){.fxbadge.show{animation:none;opacity:0}.fxglow.ok,.fxglow.no{animation-duration:.01s}}
+.wrap>header{padding-inline-end:110px}
+.sndbtn{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:calc(10px + env(safe-area-inset-left,0px));z-index:20;font:inherit;font-size:14px;background:var(--surface);color:var(--ink);border:1.5px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer}
+.sndbtn:focus-visible{outline:3px solid var(--plate);outline-offset:2px}
+</style>
+<button class="sndbtn" id="sndbtn" aria-pressed="true">الصوت: يعمل</button>
+<script>
+const SFX=(()=>{
+  let ac=null,on=true;
+  const btn=document.getElementById("sndbtn");
+  btn.onclick=()=>{on=!on;btn.setAttribute("aria-pressed",on);btn.textContent=on?"الصوت: يعمل":"الصوت: متوقف";};
+  const A=()=>{if(!on)return null;try{if(!ac)ac=new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();return ac}catch(e){return null}};
+  function tone(f,t0,d,type,vol,f2){const c=A();if(!c)return;const o=c.createOscillator(),g=c.createGain();o.type=type||"sine";o.frequency.setValueAtTime(f,c.currentTime+t0);if(f2)o.frequency.exponentialRampToValueAtTime(f2,c.currentTime+t0+d);g.gain.setValueAtTime(0,c.currentTime+t0);g.gain.linearRampToValueAtTime(vol||.2,c.currentTime+t0+.02);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t0+d);o.connect(g).connect(c.destination);o.start(c.currentTime+t0);o.stop(c.currentTime+t0+d+.05)}
+  function noise(t0,d,vol,fType,fFreq,fEnd){const c=A();if(!c)return;const n=c.sampleRate*d,b=c.createBuffer(1,n,c.sampleRate),x=b.getChannelData(0);for(let i=0;i<n;i++)x[i]=Math.random()*2-1;const s=c.createBufferSource();s.buffer=b;const f=c.createBiquadFilter();f.type=fType||"lowpass";f.frequency.setValueAtTime(fFreq||800,c.currentTime+t0);if(fEnd)f.frequency.exponentialRampToValueAtTime(fEnd,c.currentTime+t0+d);const g=c.createGain();g.gain.setValueAtTime(vol||.3,c.currentTime+t0);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t0+d);s.connect(f).connect(g).connect(c.destination);s.start(c.currentTime+t0)}
+  const fx=document.createElement("div");fx.className="fxglow";fx.setAttribute("aria-hidden","true");document.body.append(fx);
+  const badge=document.createElement("div");badge.className="fxbadge";badge.setAttribute("aria-hidden","true");badge.textContent="ممتاز";document.body.append(badge);
+  function glow(kind){fx.className="fxglow";badge.className="fxbadge";void fx.offsetWidth;fx.className="fxglow "+kind;if(kind==="ok"){void badge.offsetWidth;badge.className="fxbadge show"}}
+  const ding=()=>{tone(1318,0,.7,"sine",.22);tone(2637,0,.35,"sine",.06)};
+  const buzz=()=>{tone(150,0,.28,"square",.07,120)};
+  return{
+    good(){glow("ok");ding()},
+    bad(){glow("no");buzz()},
+    win(){glow("ok");ding();setTimeout(()=>tone(1568,0,.8,"sine",.2),220)},
+    tick(){tone(880,0,.08,"sine",.1)},
+    rumble(d,vol){noise(0,d||2,vol||.5,"lowpass",140,60)},
+    boom(){noise(0,2.5,1,"lowpass",900,40);tone(70,0,1.4,"sine",.6,30)},
+    bubble(){for(let i=0;i<10;i++)tone(300+Math.random()*500,i*.12+Math.random()*.05,.08,"sine",.07,700+Math.random()*400)},
+    hiss(d){noise(0,d||1.5,.15,"highpass",3000)},
+    whoosh(){noise(0,.6,.25,"bandpass",400,2400)},
+    thud(){tone(110,0,.25,"sine",.35,50)},
+  };
+})();
+</script>
+
+<script>
+const CODE="6184";
+const cv=document.getElementById("cv"),ctx=cv.getContext("2d"),W=600,H=400;
+const dpr=window.devicePixelRatio||1;cv.width=W*dpr;cv.height=H*dpr;ctx.setTransform(dpr,0,0,dpr,0,0);
+const C={};function readC(){const s=getComputedStyle(document.documentElement);["sky","ink","muted","surface","line","crust","mantle","outer","inner","pw","sw","ground","magma"].forEach(k=>C[k]=s.getPropertyValue("--"+k).trim())}
+readC();
+const FONT=()=>getComputedStyle(document.body).fontFamily;
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+let anim=null;function stop(){if(anim)cancelAnimationFrame(anim);anim=null}
+function loop(fn){stop();const tick=()=>{if(fn()!==false)anim=requestAnimationFrame(tick)};tick()}
+function txt(s,x,y,col,size,al){ctx.fillStyle=col||C.ink;ctx.font=`600 ${size||14}px ${FONT()}`;ctx.textAlign=al||"center";ctx.fillText(s,x,y)}
+const ctl=document.getElementById("ctl");
+function el(h){const tp=document.createElement("template");tp.innerHTML=h.trim();return tp.content}
+
+/* ---------- scene 1: particle motion ---------- */
+let mode="",T=0;const seen=new Set();
+const LANES={P:{y:78,v:3.4,k:.07,col:()=>C.pw,name:"الموجة الأولية P (طولية)"},S:{y:200,v:2.0,k:.05,col:()=>C.sw,name:"الموجة الثانوية S (مستعرضة)"},L:{y:318,v:1.4,k:.04,col:()=>C.magma,name:"الموجة السطحية (على سطح الأرض)"}};
+const X0=36,X1=564,TRACK=Math.round((300-X0)/16);
+function env(m,x){if(mode!=="ALL")return 1;const f=X0+LANES[m].v*T;return x<=f?1:Math.max(0,1-(x-f)/14)}
+function arrow2(x1,y1,x2,y2,col){ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();[[x1,y1,x2,y2],[x2,y2,x1,y1]].forEach(([a,b,c,d])=>{const an=Math.atan2(d-b,c-a);ctx.beginPath();ctx.moveTo(c,d);ctx.lineTo(c-9*Math.cos(an-.45),d-9*Math.sin(an-.45));ctx.lineTo(c-9*Math.cos(an+.45),d-9*Math.sin(an+.45));ctx.closePath();ctx.fill()})}
+function arrow1(x1,y1,x2,y2,col){ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-8,y2-5);ctx.lineTo(x2-8,y2+5);ctx.closePath();ctx.fill()}
+function drawMotion(){
+  ctx.clearRect(0,0,W,H);ctx.fillStyle=C.sky;ctx.fillRect(0,0,W,H);
+  ["P","S","L"].forEach(m=>{
+    const Ln=LANES[m],on=mode===m||mode==="ALL",col=on?Ln.col():C.muted,y=Ln.y,w=Ln.v*Ln.k;
+    const ph=x=>Ln.k*x-w*T;
+    ctx.globalAlpha=on?1:.35;
+    txt(Ln.name,W-14,y-48,col,15,"right");
+    if(m==="P"){
+      for(let i=0;i*15+X0<=X1;i++){const x0=X0+i*15,dx=on?Math.sin(ph(x0))*10*env(m,x0):0;ctx.strokeStyle=i===TRACK&&on?C.ink:col;ctx.lineWidth=i===TRACK&&on?4:2.5;ctx.beginPath();ctx.moveTo(x0+dx,y-26);ctx.lineTo(x0+dx,y+26);ctx.stroke()}
+      if(on){const x0=X0+TRACK*15;arrow2(x0-16,y+40,x0+16,y+40,C.ink)}
+    }
+    if(m==="S"){
+      const pts=[];for(let i=0;i*16+X0<=X1;i++){const x0=X0+i*16;pts.push([x0,y+(on?Math.sin(ph(x0))*26*env(m,x0):0)])}
+      ctx.strokeStyle=col;ctx.lineWidth=2;ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(p[0],p[1]):ctx.moveTo(p[0],p[1]));ctx.stroke();
+      pts.forEach((p,i)=>{ctx.fillStyle=i===TRACK&&on?C.ink:col;ctx.beginPath();ctx.arc(p[0],p[1],i===TRACK&&on?7:5.5,0,Math.PI*2);ctx.fill()});
+      if(on){const x0=X0+TRACK*16;arrow2(x0+22,y-24,x0+22,y+24,C.ink)}
+    }
+    if(m==="L"){
+      const surf=x=>y-10+(on?Math.sin(ph(x))*13*env(m,x):0);
+      ctx.fillStyle=on?C.crust:C.line;ctx.beginPath();ctx.moveTo(X0,y+52);for(let x=X0;x<=X1;x+=4)ctx.lineTo(x,surf(x));ctx.lineTo(X1,y+52);ctx.closePath();ctx.fill();
+      for(let r=0;r<2;r++)for(let i=0;i*22+X0+8<=X1;i++){const x0=X0+8+i*22,dep=r*.45,e=on?env(m,x0)*(1-dep):0;const dx=Math.cos(ph(x0))*9*e,dy=Math.sin(ph(x0))*13*e;ctx.fillStyle=r===0&&i===Math.round((300-X0-8)/22)&&on?C.ink:C.surface;ctx.beginPath();ctx.arc(x0+dx,y+6+r*20+dy,4.5,0,Math.PI*2);ctx.fill()}
+      /* house */
+      const hx=150,hy=surf(hx),sl=on?Math.atan2(surf(hx+12)-surf(hx-12),24):0;ctx.save();ctx.translate(hx,hy);ctx.rotate(sl*1.2);ctx.fillStyle=C.surface;ctx.strokeStyle=C.ink;ctx.lineWidth=1.5;ctx.fillRect(-16,-24,32,24);ctx.strokeRect(-16,-24,32,24);ctx.beginPath();ctx.moveTo(-20,-24);ctx.lineTo(0,-40);ctx.lineTo(20,-24);ctx.closePath();ctx.fillStyle=C.magma;ctx.fill();ctx.stroke();ctx.restore();
+      if(on){const cx0=300,cy0=y+56;ctx.strokeStyle=C.ink;ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(cx0,cy0,9,.3,Math.PI*1.8);ctx.stroke();ctx.fillStyle=C.ink;ctx.beginPath();ctx.moveTo(cx0+9*Math.cos(1.8*Math.PI)+5,cy0+9*Math.sin(1.8*Math.PI));ctx.lineTo(cx0+9*Math.cos(1.8*Math.PI)-3,cy0+9*Math.sin(1.8*Math.PI)-6);ctx.lineTo(cx0+9*Math.cos(1.8*Math.PI)-3,cy0+9*Math.sin(1.8*Math.PI)+5);ctx.fill()}
+    }
+    ctx.globalAlpha=1;
+    if(mode==="ALL"){const f=X0+Ln.v*T;if(f<X1){ctx.strokeStyle=Ln.col();ctx.setLineDash([4,4]);ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(f,y-40);ctx.lineTo(f,y+44);ctx.stroke();ctx.setLineDash([])}else{const ord={P:"وصلت أولاً",S:"وصلت ثانياً",L:"وصلت أخيراً"}[m];txt(ord,X0+4,y-48,Ln.col(),14,"left")}}
+  });
+  /* propagation arrow */
+  arrow1(X0,H-12,X0+90,H-12,C.muted);txt("اتجاه انتشار الموجات",X0+96,H-7,C.muted,12,"left");
+}
+function scene1(){
+  ctl.replaceChildren(el(`<div class="lbl">اختاري نوع الموجة وراقبي حركة الجسيم الأسود، ثم قارني بينها جميعاً:</div><div class="btns"><button class="btn p" id="bP">الأولية P</button><button class="btn s" id="bS">الثانوية S</button><button class="btn" id="bL">السطحية</button><button class="btn g" id="bA">قارني بينها معاً</button></div>`));
+  const go=m=>{SFX.tick();mode=m;seen.add(m);T=0;gate1();
+    if(reduce){T=m==="ALL"?400:6;drawMotion();return}
+    loop(()=>{T+=1;if(mode==="ALL"&&T>X1/1.4+90)T=0;drawMotion()})};
+  document.getElementById("bP").onclick=()=>go("P");document.getElementById("bS").onclick=()=>go("S");document.getElementById("bL").onclick=()=>go("L");document.getElementById("bA").onclick=()=>go("ALL");
+  mode="";drawMotion();
+}
+const CMP_TABLE=`<div class="tablebox"><table style="min-width:0;font-size:13px"><thead><tr><th>وجه المقارنة</th><th style="color:var(--pw)">الأولية P</th><th style="color:var(--sw)">الثانوية S</th><th style="color:var(--magma)">السطحية</th></tr></thead><tbody>
+<tr><td>نوعها</td><td>طولية (تضاغطية)</td><td>مستعرضة</td><td>تتحرك على سطح الأرض</td></tr>
+<tr><td>حركة جسيمات الصخر</td><td>إلى الأمام والخلف، في اتجاه انتشار الموجة</td><td>إلى الأعلى والأسفل، عمودية على اتجاه الانتشار</td><td>حركة دائرية وجانبية تشبه الدحرجة</td></tr>
+<tr><td>السرعة</td><td>الأسرع (نحو ٦–٨ كم/ث)</td><td>أبطأ من الأولية (نحو ٣–٤ كم/ث)</td><td>الأبطأ</td></tr>
+<tr><td>ترتيب الوصول لمحطة الرصد</td><td>أولاً</td><td>ثانياً</td><td>أخيراً</td></tr>
+<tr><td>المواد التي تنتقل فيها</td><td>الصلبة والسائلة</td><td>الصلبة فقط</td><td>على سطح الأرض</td></tr>
+<tr><td>مكان انتقالها</td><td>داخل الأرض</td><td>داخل الأرض</td><td>على سطح الأرض</td></tr>
+<tr><td>قوة التدمير</td><td>الأقل تدميراً</td><td>أكثر من الأولية</td><td>الأكثر تدميراً للمباني</td></tr>
+</tbody></table></div>`;
+
+/* ---------- scene 2: race to station ---------- */
+let raced=false;
+function drawRace(tp,ts){
+  ctx.clearRect(0,0,W,H);ctx.fillStyle=C.sky;ctx.fillRect(0,0,W,140);ctx.fillStyle=C.crust;ctx.fillRect(0,140,W,H-140);
+  const fx=60,fy=300,sx=W-70,sy=140;
+  ctx.strokeStyle=C.surface;ctx.setLineDash([5,6]);ctx.beginPath();ctx.moveTo(fx,fy);ctx.lineTo(sx,sy);ctx.stroke();ctx.setLineDash([]);
+  ctx.fillStyle=C.magma;ctx.beginPath();ctx.arc(fx,fy,9,0,Math.PI*2);ctx.fill();txt("بؤرة الزلزال",fx+10,fy+30,C.surface,14);
+  ctx.fillStyle=C.ink;ctx.fillRect(sx-18,sy-34,36,30);ctx.fillStyle=C.surface;ctx.fillRect(sx-13,sy-29,26,20);txt("محطة رصد",sx,sy-44,C.ink,14);
+  const pt=k=>[fx+(sx-fx)*k,fy+(sy-fy)*k];
+  [[tp,C.pw,"P"],[ts,C.sw,"S"]].forEach(([k,col,l])=>{const p=pt(Math.min(1,k));ctx.fillStyle=col;ctx.beginPath();ctx.arc(p[0],p[1],10,0,Math.PI*2);ctx.fill();txt(l,p[0],p[1]+5,"#fff",13)});
+  /* seismogram */
+  const gx=40,gy=40,gw=W-200;ctx.strokeStyle=C.ink;ctx.lineWidth=1.5;ctx.beginPath();
+  for(let x=0;x<=gw;x++){const time=x/gw*1.9;let y=0;if(time>1/1.0&&tp>=1)y+=Math.sin(x*.9)*Math.min(8,(time-1)*60)*Math.exp(-(time-1)*3);if(time>1/.6&&ts>=1)y+=Math.sin(x*.5)*Math.min(20,(time-1/.6)*80)*Math.exp(-(time-1/.6)*3);ctx.lineTo(gx+x,gy+40-y)}
+  ctx.stroke();txt("سجل جهاز السيزموجراف",gx+gw/2,gy+12,C.muted,12);
+}
+function scene2(){
+  ctl.replaceChildren(el(`<div class="lbl">أطلقي زلزالاً وراقبي أي الموجتين تصل إلى محطة الرصد أولاً:</div><div class="btns"><button class="btn" id="bR">أطلقي الزلزال</button></div><div class="readout" id="ro"></div>`));
+  drawRace(0,0);
+  document.getElementById("bR").onclick=()=>{SFX.rumble(1.6,.6);let k=0;const ro=document.getElementById("ro");ro.textContent="";
+    const end=()=>{SFX.tick();drawRace(1.2,1.2);ro.textContent="وصلت الموجة الأولية P أولاً، ثم الثانوية S بعدها.";raced=true;gate2()};
+    if(reduce){end();return}
+    loop(()=>{k+=.006;const tp=k,ts=k*.6;drawRace(tp,ts);if(ts>=1.05){end();return false}})};
+}
+/* ---------- scene 3: Earth interior ---------- */
+const E={cx:300,cy:208,R:176};const RC=E.R*.55,RI=E.R*.19,RM=E.R*.985;
+let fired={P:false,S:false},rays=[],shadowS=false;
+function drawEarth(){
+  ctx.clearRect(0,0,W,H);ctx.fillStyle=C.sky;ctx.fillRect(0,0,W,H);
+  const c=(r,col)=>{ctx.fillStyle=col;ctx.beginPath();ctx.arc(E.cx,E.cy,r,0,Math.PI*2);ctx.fill()};
+  c(E.R,C.crust);c(RM,C.mantle);c(RC,C.outer);c(RI,C.inner);
+  txt("الستار (صلب)",E.cx-112,E.cy-40,C.ink,16);txt("اللب الخارجي (سائل)",E.cx,E.cy+RC*.66,C.ink,16);txt("اللب الداخلي",E.cx,E.cy+5,C.ink,14);
+  txt("القشرة",E.cx+E.R+6,E.cy-E.R*.3,C.ink,15,"left");
+}
+function rayPath(theta,type){/* theta: angle from straight-down, radians */
+  const f=[E.cx,E.cy-E.R+3];let d=[Math.sin(theta),Math.cos(theta)];
+  const hit=(p,d,r,far)=>{const ox=p[0]-E.cx,oy=p[1]-E.cy,b=ox*d[0]+oy*d[1],cc=ox*ox+oy*oy-r*r,disc=b*b-cc;if(disc<0)return null;const s=far?-b+Math.sqrt(disc):-b-Math.sqrt(disc);return s>1e-3?s:null};
+  const pts=[f];let p=f;const sc=hit(p,d,RC,false);
+  if(sc==null){const s=hit(p,d,E.R,true);pts.push([p[0]+d[0]*s,p[1]+d[1]*s]);return{pts,stop:false}}
+  const q=[p[0]+d[0]*sc,p[1]+d[1]*sc];pts.push(q);
+  if(type==="S")return{pts,stop:true};
+  /* refract into liquid core: slower -> bend toward normal */
+  const refr=(d,n,ratio)=>{const cosi=-(d[0]*n[0]+d[1]*n[1]);const k=1-ratio*ratio*(1-cosi*cosi);if(k<0)return null;const a=ratio*cosi-Math.sqrt(k);return[ratio*d[0]+a*n[0],ratio*d[1]+a*n[1]]};
+  let n=[(q[0]-E.cx)/RC,(q[1]-E.cy)/RC];d=refr(d,n,.62);p=q;
+  const s2=hit(p,d,RC,true);const q2=[p[0]+d[0]*s2,p[1]+d[1]*s2];pts.push(q2);
+  n=[-(q2[0]-E.cx)/RC,-(q2[1]-E.cy)/RC];d=refr(d,n,1/.62)||d;p=q2;
+  const s3=hit(p,d,E.R,true);pts.push([p[0]+d[0]*s3,p[1]+d[1]*s3]);return{pts,stop:false};
+}
+function polyLen(pts){let L=0;for(let i=1;i<pts.length;i++)L+=Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]);return L}
+function drawRays(prog){
+  rays.forEach(r=>{const col=r.type==="P"?C.pw:C.sw;let left=prog*r.speed;ctx.strokeStyle=col;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(r.pts[0][0],r.pts[0][1]);let end=r.pts[0],done=true;
+    for(let i=1;i<r.pts.length;i++){const a=r.pts[i-1],b=r.pts[i],L=Math.hypot(b[0]-a[0],b[1]-a[1]);if(left>=L){ctx.lineTo(b[0],b[1]);end=b;left-=L}else{const k=left/L;end=[a[0]+(b[0]-a[0])*k,a[1]+(b[1]-a[1])*k];ctx.lineTo(end[0],end[1]);done=false;break}}
+    ctx.stroke();
+    if(done&&r.stop){ctx.strokeStyle=C.sw;ctx.lineWidth=3;const e=r.pts[1];ctx.beginPath();ctx.moveTo(e[0]-6,e[1]-6);ctx.lineTo(e[0]+6,e[1]+6);ctx.moveTo(e[0]+6,e[1]-6);ctx.lineTo(e[0]-6,e[1]+6);ctx.stroke()}
+    if(done&&!r.stop){const e=r.pts[r.pts.length-1];ctx.fillStyle=col;ctx.beginPath();ctx.arc(e[0],e[1],4.5,0,Math.PI*2);ctx.fill()}
+    else if(!done){ctx.fillStyle=col;ctx.beginPath();ctx.arc(end[0],end[1],4,0,Math.PI*2);ctx.fill()}
+  });
+  if(shadowS){ctx.strokeStyle=C.sw;ctx.lineWidth=7;ctx.setLineDash([10,7]);ctx.beginPath();ctx.arc(E.cx,E.cy,E.R+5,23*Math.PI/180,157*Math.PI/180);ctx.stroke();ctx.setLineDash([]);ctx.save();ctx.lineWidth=4;ctx.strokeStyle=C.surface;ctx.font=`700 15px ${FONT()}`;ctx.textAlign="center";ctx.strokeText("لم تصل الموجات الثانوية إلى هنا",E.cx,E.cy+E.R-32);ctx.fillStyle=C.sw;ctx.fillText("لم تصل الموجات الثانوية إلى هنا",E.cx,E.cy+E.R-32);ctx.restore()}
+  ctx.fillStyle=C.magma;ctx.beginPath();ctx.arc(E.cx,E.cy-E.R+3,8,0,Math.PI*2);ctx.fill();txt("بؤرة الزلزال",E.cx+14,E.cy-E.R-3,C.ink,15,"left");
+}
+function scene3(){
+  ctl.replaceChildren(el(`<div class="lbl">أطلقي كل نوع من الموجات داخل الأرض وراقبي ما يحدث عند اللب الخارجي السائل:</div><div class="btns"><button class="btn p" id="fP">أطلقي الموجات الأولية P</button><button class="btn s" id="fS">أطلقي الموجات الثانوية S</button></div><div class="key"><span><i style="background:var(--pw)"></i>موجات أولية</span><span><i style="background:var(--sw)"></i>موجات ثانوية</span><span>✕ توقفت الموجة</span></div><div class="readout" id="ro3"></div>`));
+  drawEarth();drawRays(0);
+  const fire=type=>{SFX.rumble(1.8,.45);rays=[];shadowS=false;for(let a=-80;a<=80;a+=8){if(a===0)continue;rays.push(Object.assign(rayPath(a*Math.PI/180,type),{type,speed:type==="P"?1:.6}))}
+    const maxL=Math.max(...rays.map(r=>polyLen(r.pts)/r.speed));let prog=0;const ro=document.getElementById("ro3");ro.textContent="";
+    const end=()=>{if(type==="S")SFX.thud();shadowS=type==="S";drawEarth();drawRays(1e4);fired[type]=true;ro.textContent=type==="P"?"عبرت الموجات الأولية اللب الخارجي السائل، لكن سرعتها قلّت فانحنى مسارها.":"توقفت الموجات الثانوية عند اللب الخارجي، فلم تصل إلى الجهة المقابلة من الأرض.";gate3()};
+    if(reduce){end();return}
+    loop(()=>{prog+=4;drawEarth();drawRays(prog);if(prog>maxL+10){end();return false}})};
+  document.getElementById("fP").onclick=()=>fire("P");document.getElementById("fS").onclick=()=>fire("S");
+}
+
+/* ---------- tasks ---------- */
+const task=document.getElementById("task"),stepsEl=[...document.querySelectorAll("#steps li")];
+function setStep(i){stepsEl.forEach((li,k)=>{li.className=k<i?"done":k===i?"now":""})}
+function quiz(title,text,opts,right,hint,ok,next){
+  task.replaceChildren(el(`<h2>${title}</h2><p>${text}</p><div class="opts">${opts.map((o,i)=>`<button class="opt" id="q${i}" data-i="${i}">${o}</button>`).join("")}</div><div class="fb" hidden></div>`));
+  const fb=task.querySelector(".fb");
+  task.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    if(+b.dataset.i===right){SFX.good();task.querySelectorAll(".opt").forEach(x=>x.disabled=true);b.classList.add("right");fb.hidden=false;fb.className="fb ok";fb.textContent=ok;
+      const n=document.createElement("button");n.className="btn";n.textContent="التالي";n.onclick=next;task.append(n);n.focus()}
+    else{SFX.bad();b.classList.add("wrong");b.disabled=true;fb.hidden=false;fb.className="fb no";fb.textContent=hint}
+  });
+}
+function gateCard(title,text,check,next){task.replaceChildren(el(`<h2>${title}</h2><p>${text}</p><p class="lbl" id="gt"></p><button class="btn" id="gn" disabled>التالي</button>`));document.getElementById("gn").onclick=next;check()}
+function gate1(){const g=document.getElementById("gt");if(!g)return;g.textContent=`شغّلتِ ${"٠١٢٣٤"[seen.size]} من ٤ أزرار`;document.getElementById("gn").disabled=seen.size<4}
+function gate2(){const g=document.getElementById("gt");if(!g)return;g.textContent=raced?"أنهيتِ التجربة":"لم تُطلقي الزلزال بعد";document.getElementById("gn").disabled=!raced}
+function gate3(){const g=document.getElementById("gt");if(!g)return;const n=(fired.P?1:0)+(fired.S?1:0);g.textContent=`أطلقتِ ${"٠١٢"[n]} من نوعين`;document.getElementById("gn").disabled=n<2}
+
+function st1(){setStep(0);scene1();gateCard("المرحلة الأولى: كيف تتحرك الموجات؟","شغّلي كل موجة وحدها، ثم اضغطي «قارني بينها معاً» لتري الموجات الثلاث تنطلق في الوقت نفسه.",gate1,()=>{stop();
+  quiz("المرحلة الأولى: كيف تتحرك الموجات؟","في الموجة الأولية، كيف اهتزت الجسيمات؟",["إلى الأعلى والأسفل، عمودياً على اتجاه الانتشار","إلى الأمام والخلف، في اتجاه انتشار الموجة نفسه","في حركة دائرية على السطح"],1,"شغّلي الموجة الأولية مرة أخرى وراقبي: هل تتقارب الجسيمات وتتباعد، أم تصعد وتهبط؟","صحيح! الموجة الأولية طولية: انضغاط وتخلخل في اتجاه انتشارها.",st1b)})}
+function st1b(){stop();task.replaceChildren(el(`<h2>جدول المقارنة بين الموجات الزلزالية</h2><p>هذا ملخص ما شاهدتِه في المعمل. اقرئيه جيداً قبل الانتقال.</p>${CMP_TABLE}<button class="btn" id="tn">التالي</button>`));document.getElementById("tn").onclick=st2}
+function st2(){setStep(1);scene2();gateCard("المرحلة الثانية: سباق الموجات","أطلقي الزلزال وراقبي وصول الموجتين إلى محطة الرصد وما يرسمه جهاز السيزموجراف.",gate2,()=>
+  quiz("المرحلة الثانية: سباق الموجات","أي الموجتين وصلت إلى محطة الرصد أولاً؟",["الموجة الثانوية S","الموجة الأولية P","وصلتا معاً"],1,"شاهدي التجربة مرة أخرى وتابعي الدائرتين.","صحيح! الموجات الأولية أسرع الموجات الزلزالية، ولذلك تصل أولاً. والفرق بين زمني الوصول يساعد على تحديد بُعد المركز السطحي للزلزال.",st3))}
+function st3(){setStep(2);scene3();gateCard("المرحلة الثالثة: داخل الأرض","أطلقي الموجات الأولية، ثم الثانوية، وقارني ما يحدث لكل منهما عند الوصول إلى اللب الخارجي.",gate3,()=>
+  quiz("المرحلة الثالثة: داخل الأرض","في المعمل، ماذا حدث للموجات الثانوية عندما وصلت إلى اللب الخارجي؟",["عبرته بسرعة أكبر","توقفت ولم تنتقل خلاله","انعكست إلى القشرة فقط بسرعة أكبر"],1,"أطلقي الموجات الثانوية مرة أخرى وراقبي علامة ✕.","صحيح! الموجات الثانوية لا تنتقل خلال السوائل.",()=>
+    quiz("المرحلة الثالثة: داخل الأرض","الموجات الثانوية لا تنتقل في السوائل. ماذا استنتج العلماء من توقفها عند اللب الخارجي؟",["أن اللب الخارجي سائل","أن اللب الخارجي صلب جداً","أن اللب الخارجي فارغ"],0,"فكّري: في أي حالة للمادة تتوقف الموجات الثانوية؟","أحسنتِ! هكذا عرف العلماء أن اللب الخارجي سائل دون أن يصلوا إليه.",st4)))}
+function st4(){setStep(3);stop();drawEarth();drawRays(1e4);
+  quiz("المرحلة الرابعة: الخلاصة","لم يستطع أحد الحفر إلى باطن الأرض. فكيف توصّل العلماء إلى معرفة طبقاتها ومكوناتها؟",["من دراسة البراكين فقط","من دراسة الموجات الزلزالية وسرعتها وطريقة انتقالها في المواد المختلفة","من صور الأقمار الصناعية"],1,"تذكّري ما فعلتِه في المرحلة الثالثة.","صحيح! سرعة الموجات الزلزالية تتغير حسب المادة التي تنتقل فيها، فدراستها كشفت طبقات الأرض.",finish)}
+function finish(){
+  SFX.win();
+  stepsEl.forEach(li=>li.className="done");task.classList.add("done-card");
+  task.replaceChildren(el(`<h2>أنهيتِ المعمل</h2><p>رمز الإنجاز الخاص بهذا المعمل:</p><div class="code">${CODE}</div><p>عودي إلى النموذج واكتبي هذا الرمز، ثم أجيبي عن أسئلة التحقق.</p><h2>ما تعلمتِه</h2><ul class="learned"><li>الموجة الأولية طولية، والثانوية مستعرضة، والسطحية تتحرك على سطح الأرض.</li><li>الموجات الأولية أسرع، فتصل إلى محطة الرصد أولاً.</li><li>الموجات الثانوية لا تنتقل في السوائل، فتتوقف عند اللب الخارجي السائل.</li><li>دراسة الموجات الزلزالية مكّنت العلماء من معرفة طبقات باطن الأرض.</li></ul>`));
+}
+st1();
+</script>

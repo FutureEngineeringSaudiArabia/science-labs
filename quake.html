@@ -1,0 +1,293 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>body{margin:0;font-size:14px}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>معمل التنبؤ بالزلازل</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
+<style>
+/* Layout: one lab sheet — step bar, volcano chamber with controls, observation table, task card */
+:root{
+  --bg:#f3f1ec; --surface:#ffffff; --ink:#1f2328; --muted:#5d6570; --line:#d9d4c9;
+  --sky:#dbe6ec; --rock:#8a7a66; --rock2:#a3927c; --ground:#6f6253;
+  --magma:#d9480f; --magma-soft:#fde7dc; --lavaLo:#ff5a1f; --lavaHi:#c98a6a; --ash:#7c7f86;
+  --plate:#1c5d8c; --ok:#1f7a4d; --ok-soft:#dff1e7; --bad:#b42318; --bad-soft:#fbe4e1;
+  --display:"Readex Pro","IBM Plex Sans Arabic",Tahoma,sans-serif;
+  --body:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#14171b; --surface:#1c2026; --ink:#eceff3; --muted:#a3abb6; --line:#2e343c;
+  --sky:#1a2833; --rock:#6b5f51; --rock2:#7d705f; --ground:#4a4136;
+  --magma:#ff7a3d; --magma-soft:#3b2116; --lavaLo:#ff6a2e; --lavaHi:#d79a7a; --ash:#9a9da4;
+  --plate:#6cb8ef; --ok:#5fd39a; --ok-soft:#173326; --bad:#ff8a7a; --bad-soft:#3a1d1a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14171b; --surface:#1c2026; --ink:#eceff3; --muted:#a3abb6; --line:#2e343c;
+  --sky:#1a2833; --rock:#6b5f51; --rock2:#7d705f; --ground:#4a4136;
+  --magma:#ff7a3d; --magma-soft:#3b2116; --lavaLo:#ff6a2e; --lavaHi:#d79a7a; --ash:#9a9da4;
+  --plate:#6cb8ef; --ok:#5fd39a; --ok-soft:#173326; --bad:#ff8a7a; --bad-soft:#3a1d1a; color-scheme:dark}
+html{direction:rtl}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.7}
+.wrap{max-width:860px;margin:0 auto;padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+header{display:flex;flex-direction:column;gap:4px}
+.eyebrow{font-size:13px;color:var(--muted);letter-spacing:.02em}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(24px,5vw,32px);line-height:1.3;margin:0;text-wrap:balance}
+.steps{display:flex;gap:6px;list-style:none;margin:6px 0 0;padding:0}
+.steps li{flex:1;height:6px;border-radius:3px;background:var(--line)}
+.steps li.done{background:var(--plate)}
+.steps li.now{background:var(--magma)}
+.lab{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+canvas{display:block;width:100%;height:auto;background:var(--sky)}
+.controls{display:flex;flex-direction:column;gap:10px;padding:14px;border-top:1px solid var(--line)}
+.lbl{font-size:14px;color:var(--muted)}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.seg button{font:inherit;font-size:15px;background:var(--bg);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:8px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;line-height:1.3}
+.seg button small{color:var(--muted);font-size:12px;font-variant-numeric:tabular-nums}
+.seg button[aria-pressed="true"]{border-color:var(--magma);background:var(--magma-soft)}
+.seg button.tried::after{content:"✓";font-size:12px;color:var(--ok)}
+.run{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.meter{flex:1;min-width:160px;display:flex;flex-direction:column;gap:4px}
+.bar{height:10px;border-radius:5px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--magma);transition:width .15s linear}
+.tablebox{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:520px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right}
+th{font-weight:600;color:var(--muted);font-size:13px}
+td.empty{color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.card h2{font-family:var(--display);font-weight:500;font-size:20px;margin:0}
+.card p{margin:0;max-width:65ch}
+.opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:right;background:var(--bg);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer}
+.opt:hover{border-color:var(--plate)}
+.opt:focus-visible,.btn:focus-visible,.seg button:focus-visible{outline:3px solid var(--plate);outline-offset:2px}
+.opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.opt[disabled]{cursor:default}
+.btn{font:inherit;font-weight:600;background:var(--magma);color:#fff;border:0;border-radius:10px;padding:12px 18px;cursor:pointer;align-self:flex-start}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.alt{background:var(--plate)}
+.fb{border-radius:10px;padding:10px 14px;font-size:15px}
+.fb.ok{background:var(--ok-soft);color:var(--ok)}
+.fb.no{background:var(--bad-soft);color:var(--bad)}
+.done-card{border:2px solid var(--ok)}
+.code{font-family:var(--display);font-weight:700;font-size:44px;letter-spacing:.15em;direction:ltr;text-align:center;background:var(--ok-soft);color:var(--ok);border-radius:12px;padding:10px;font-variant-numeric:tabular-nums}
+ul.learned{margin:0;padding-inline-start:20px;display:grid;gap:4px}
+.hi{background:var(--magma-soft)}
+</style>
+<style>
+.fxglow{position:fixed;inset:0;pointer-events:none;z-index:30;opacity:0}
+.fxglow.ok{box-shadow:inset 0 0 0 6px #2fbf71,inset 0 0 90px 30px rgba(47,191,113,.55);animation:fxg 1s ease-out}
+.fxglow.no{box-shadow:inset 0 0 0 6px #e5484d,inset 0 0 90px 30px rgba(229,72,77,.45);animation:fxg .8s ease-out}
+@keyframes fxg{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
+.fxbadge{position:fixed;left:50%;top:40%;z-index:31;pointer-events:none;font-family:var(--display);font-weight:700;font-size:42px;color:#fff;background:#1f9d5c;padding:8px 30px;border-radius:999px;opacity:0;transform:translate(-50%,-50%) scale(.6)}
+.fxbadge.show{animation:fxb 1.1s ease-out}
+@keyframes fxb{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}35%{transform:translate(-50%,-50%) scale(1)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
+@media (prefers-reduced-motion:reduce){.fxbadge.show{animation:none;opacity:0}.fxglow.ok,.fxglow.no{animation-duration:.01s}}
+.wrap>header{padding-inline-end:110px}
+.sndbtn{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:calc(10px + env(safe-area-inset-left,0px));z-index:20;font:inherit;font-size:14px;background:var(--surface);color:var(--ink);border:1.5px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer}
+.sndbtn:focus-visible{outline:3px solid var(--plate);outline-offset:2px}
+</style>
+<button class="sndbtn" id="sndbtn" aria-pressed="true">الصوت: يعمل</button>
+<script>
+const SFX=(()=>{
+  let ac=null,on=true;
+  const btn=document.getElementById("sndbtn");
+  btn.onclick=()=>{on=!on;btn.setAttribute("aria-pressed",on);btn.textContent=on?"الصوت: يعمل":"الصوت: متوقف";};
+  const A=()=>{if(!on)return null;try{if(!ac)ac=new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();return ac}catch(e){return null}};
+  function tone(f,t0,d,type,vol,f2){const c=A();if(!c)return;const o=c.createOscillator(),g=c.createGain();o.type=type||"sine";o.frequency.setValueAtTime(f,c.currentTime+t0);if(f2)o.frequency.exponentialRampToValueAtTime(f2,c.currentTime+t0+d);g.gain.setValueAtTime(0,c.currentTime+t0);g.gain.linearRampToValueAtTime(vol||.2,c.currentTime+t0+.02);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t0+d);o.connect(g).connect(c.destination);o.start(c.currentTime+t0);o.stop(c.currentTime+t0+d+.05)}
+  function noise(t0,d,vol,fType,fFreq,fEnd){const c=A();if(!c)return;const n=c.sampleRate*d,b=c.createBuffer(1,n,c.sampleRate),x=b.getChannelData(0);for(let i=0;i<n;i++)x[i]=Math.random()*2-1;const s=c.createBufferSource();s.buffer=b;const f=c.createBiquadFilter();f.type=fType||"lowpass";f.frequency.setValueAtTime(fFreq||800,c.currentTime+t0);if(fEnd)f.frequency.exponentialRampToValueAtTime(fEnd,c.currentTime+t0+d);const g=c.createGain();g.gain.setValueAtTime(vol||.3,c.currentTime+t0);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t0+d);s.connect(f).connect(g).connect(c.destination);s.start(c.currentTime+t0)}
+  const fx=document.createElement("div");fx.className="fxglow";fx.setAttribute("aria-hidden","true");document.body.append(fx);
+  const badge=document.createElement("div");badge.className="fxbadge";badge.setAttribute("aria-hidden","true");badge.textContent="ممتاز";document.body.append(badge);
+  function glow(kind){fx.className="fxglow";badge.className="fxbadge";void fx.offsetWidth;fx.className="fxglow "+kind;if(kind==="ok"){void badge.offsetWidth;badge.className="fxbadge show"}}
+  const ding=()=>{tone(1318,0,.7,"sine",.22);tone(2637,0,.35,"sine",.06)};
+  const buzz=()=>{tone(150,0,.28,"square",.07,120)};
+  return{
+    good(){glow("ok");ding()},
+    bad(){glow("no");buzz()},
+    win(){glow("ok");ding();setTimeout(()=>tone(1568,0,.8,"sine",.2),220)},
+    tick(){tone(880,0,.08,"sine",.1)},
+    rumble(d,vol){noise(0,d||2,vol||.5,"lowpass",140,60)},
+    boom(){noise(0,2.5,1,"lowpass",900,40);tone(70,0,1.4,"sine",.6,30)},
+    bubble(){for(let i=0;i<10;i++)tone(300+Math.random()*500,i*.12+Math.random()*.05,.08,"sine",.07,700+Math.random()*400)},
+    hiss(d){noise(0,d||1.5,.15,"highpass",3000)},
+    whoosh(){noise(0,.6,.25,"bandpass",400,2400)},
+    thud(){tone(110,0,.25,"sine",.35,50)},
+  };
+})();
+</script>
+
+<style>
+:root{--blockA:#b9a27f;--blockB:#8f7c62;--spring:#1c5d8c;--stress:#d9480f}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--blockA:#8e7c60;--blockB:#6b5c48;--spring:#6cb8ef;--stress:#ff7a3d}}
+:root[data-theme="dark"]{--blockA:#8e7c60;--blockB:#6b5c48;--spring:#6cb8ef;--stress:#ff7a3d}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.pick button{font:inherit;background:var(--bg);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:8px 16px;cursor:pointer;font-variant-numeric:tabular-nums}
+.pick button[aria-pressed="true"]{border-color:var(--plate);background:var(--ok-soft)}
+.readout{font-family:var(--display);font-size:15px;font-variant-numeric:tabular-nums}
+.build{display:grid;gap:10px}
+.slot{border:2px dashed var(--line);border-radius:10px;padding:10px 12px;min-height:46px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.slot b{font-family:var(--display);color:var(--plate)}
+.slot.filled{border-style:solid;border-color:var(--ok);background:var(--ok-soft)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:15px;text-align:right;background:var(--bg);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer}
+.chip.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.chip:focus-visible,.pick button:focus-visible{outline:3px solid var(--plate);outline-offset:2px}
+.model{border-inline-start:4px solid var(--plate);padding:8px 12px;background:var(--bg);border-radius:6px}
+</style>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">علوم الثالث المتوسط · الفصل الثاني: تغيرات الأرض · مسار الإتقان ٤</div>
+    <h1>معمل التنبؤ بالزلازل</h1>
+    <ol class="steps" id="steps" aria-label="مراحل المعمل"><li></li><li></li><li></li><li></li></ol>
+  </header>
+
+  <section class="lab">
+    <canvas id="cv" width="600" height="380" aria-label="نموذج صفيحتين تتراكم بينهما الإجهادات حتى تنزلقا فجأة"></canvas>
+    <div class="controls" id="ctl">
+      <div class="lbl">١. توقّعي: بعد كم ثانية سينكسر الصخر عند الصدع ويحدث الزلزال؟</div>
+      <div class="btns pick" id="pick">
+        <button id="p4" data-v="4" aria-pressed="false">بعد ٤ ثوانٍ</button>
+        <button id="p6" data-v="6" aria-pressed="false">بعد ٦ ثوانٍ</button>
+        <button id="p8" data-v="8" aria-pressed="false">بعد ٨ ثوانٍ</button>
+      </div>
+      <div class="run" style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <button class="btn" id="go" disabled>٢. ابدئي دفع الصفيحتين</button>
+        <div class="readout" id="clock">الزمن: ٠٫٠ ث</div>
+      </div>
+    </div>
+    <div class="tablebox">
+      <table style="min-width:0">
+        <thead><tr><th>المحاولة</th><th>توقّعك</th><th>متى حدث الزلزال فعلاً؟</th><th>هل صدق التوقع؟</th></tr></thead>
+        <tbody id="obs">
+          <tr><td>الأولى</td><td class="empty" colspan="3">لم تُجرَّب بعد</td></tr>
+          <tr><td>الثانية</td><td class="empty" colspan="3">لم تُجرَّب بعد</td></tr>
+          <tr><td>الثالثة</td><td class="empty" colspan="3">لم تُجرَّب بعد</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="card" id="task" aria-live="polite"></section>
+</div>
+
+<script>
+const CODE="2593";
+const cv=document.getElementById("cv"),ctx=cv.getContext("2d"),W=600,H=380;
+const dpr=window.devicePixelRatio||1;cv.width=W*dpr;cv.height=H*dpr;
+const C={};function readC(){const s=getComputedStyle(document.documentElement);["sky","ink","muted","surface","line","ground","magma","blockA","blockB","spring","stress","ok","bad"].forEach(k=>C[k]=s.getPropertyValue("--"+k).trim())}readC();
+const FONT=()=>getComputedStyle(document.body).fontFamily;
+const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches;
+function txt(s,x,y,col,size,al){ctx.fillStyle=col||C.ink;ctx.font=`600 ${size||14}px ${FONT()}`;ctx.textAlign=al||"center";ctx.fillText(s,x,y)}
+const ar=n=>String(n).replace(/[0-9]/g,d=>"٠١٢٣٤٥٦٧٨٩"[d]).replace(".","٫");
+
+/* hidden rock strength per trial: different each time */
+const STR=[.5+Math.random()*.08,.9+Math.random()*.06,.68+Math.random()*.08].sort(()=>Math.random()-.5);
+let trial=0,pred=0,running=false,time=0,stress=0,shake=0,slipped=false,seis=[],slipT=0;
+const RATE=.1; /* stress per second */
+
+/* top view: a road crosses a fault; the two plates slide past each other */
+const FY=152,RX=300,DMAX=46,LBEND=60;
+let D=0,off=0,D0=0;/* D: bending displacement before slip; off: permanent offset after slip */
+function phaseText(){if(!running&&!slipped&&time===0)return"اختاري توقّعك ثم ابدئي الدفع";if(!slipped)return stress<.25?"١. الصفيحتان تتحركان في اتجاهين متعاكسين":"٢. الاحتكاك يمسك الصخور عند الصدع، فتنثني ويتراكم الإجهاد";return"٣. تجاوز الإجهاد قوة الصخور فانكسرت فجأة: زلزال!"}
+function roadX(y){const s=y<FY?1:-1,dist=Math.abs(y-FY);const bend=D*(1-Math.exp(-dist/LBEND));return RX+s*(bend+off)}
+function arrowH(x,y,dir,col,label){ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=4;ctx.beginPath();ctx.moveTo(x-dir*40,y);ctx.lineTo(x+dir*40,y);ctx.stroke();ctx.beginPath();ctx.moveTo(x+dir*52,y);ctx.lineTo(x+dir*36,y-9);ctx.lineTo(x+dir*36,y+9);ctx.closePath();ctx.fill();txt(label,x,y-14,col,13)}
+function draw(){
+  ctx.setTransform(dpr,0,0,dpr,shake?(Math.random()-.5)*shake*dpr:0,shake?(Math.random()-.5)*shake*dpr:0);
+  ctx.clearRect(-20,-20,W+40,H+40);ctx.fillStyle=C.sky;ctx.fillRect(-20,-20,W+40,H+40);
+  /* caption */
+  ctx.fillStyle=C.surface;ctx.fillRect(0,0,W,40);txt(phaseText(),W-14,26,slipped?C.bad:C.ink,16,"right");
+  /* plates (top view) */
+  const top=46,bot=258;
+  ctx.fillStyle=C.blockA;ctx.fillRect(0,top,W,FY-top);ctx.fillStyle=C.blockB;ctx.fillRect(0,FY,W,bot-FY);
+  /* fault line */
+  ctx.strokeStyle=C.bad;ctx.lineWidth=3;ctx.setLineDash([10,6]);ctx.beginPath();ctx.moveTo(0,FY);ctx.lineTo(W,FY);ctx.stroke();ctx.setLineDash([]);
+  txt("الصدع",44,FY-8,C.bad,14);
+  /* road */
+  const seg=(y0,y1)=>{ctx.beginPath();for(let y=y0;(y1>y0?y<=y1:y>=y1);y+=(y1>y0?3:-3)){const x=roadX(y);y===y0?ctx.moveTo(x,y):ctx.lineTo(x,y)}};
+  [[top,FY-1],[FY+1,bot]].forEach(([a,b])=>{ctx.strokeStyle="#4a4e55";ctx.lineWidth=34;ctx.lineCap="butt";seg(a,b);ctx.stroke();ctx.strokeStyle="#f4f1e8";ctx.lineWidth=3;ctx.setLineDash([12,10]);seg(a,b);ctx.stroke();ctx.setLineDash([])});
+  txt("طريق يعبر الصدع",roadX(top+30)+26,top+60,C.ink,14,"left");
+  /* motion arrows */
+  arrowH(150,top+50,1,C.ink,"الصفيحة الأولى");arrowH(460,bot-30,-1,C.ink,"الصفيحة الثانية");
+  /* horizontal stress bar: each plate pushes toward the fault */
+  const gy=bot+6,gh=28,gx0=10,gx1=W-10,mid=W/2,sv=Math.min(1,stress);
+  ctx.fillStyle=C.surface;ctx.fillRect(gx0,gy,gx1-gx0,gh);ctx.strokeStyle=C.ink;ctx.lineWidth=1;ctx.strokeRect(gx0,gy,gx1-gx0,gh);
+  ctx.fillStyle=C.blockA;ctx.fillRect(gx0+1,gy+1,(mid-gx0-1)*sv,gh-2);
+  ctx.fillStyle=C.blockB;ctx.fillRect(gx1-1-(gx1-mid-1)*sv,gy+1,(gx1-mid-1)*sv,gh-2);
+  ctx.strokeStyle=C.bad;ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(mid,gy-4);ctx.lineTo(mid,gy+gh+4);ctx.stroke();
+  const lab=(s,x,dir)=>{txt(s,x,gy+19,C.ink,13);ctx.strokeStyle=C.ink;ctx.fillStyle=C.ink;ctx.lineWidth=2;const ax=x+dir*78;ctx.beginPath();ctx.moveTo(ax-dir*14,gy+14);ctx.lineTo(ax+dir*8,gy+14);ctx.stroke();ctx.beginPath();ctx.moveTo(ax+dir*14,gy+14);ctx.lineTo(ax+dir*6,gy+9);ctx.lineTo(ax+dir*6,gy+19);ctx.closePath();ctx.fill()};
+  lab("إجهاد الصفيحة الأولى",(gx0+mid)/2-14,1);lab("إجهاد الصفيحة الثانية",(gx1+mid)/2+14,-1);
+  /* seismogram */
+  const sx=10,sy=bot+42,sw=W-20,sh=H-sy-6;ctx.fillStyle=C.surface;ctx.fillRect(sx,sy,sw,sh);ctx.strokeStyle=C.line;ctx.strokeRect(sx,sy,sw,sh);
+  ctx.strokeStyle=C.ink;ctx.lineWidth=1.4;ctx.beginPath();seis.forEach((v,i)=>{const x=sx+sw-(seis.length-i)*2;if(x<sx)return;const y=sy+sh/2-v;i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();
+  txt("جهاز رصد الزلازل",sx+sw-8,sy+14,C.muted,12,"right");
+}
+const clock=document.getElementById("clock");
+document.querySelectorAll("#pick button").forEach(b=>b.onclick=()=>{if(running)return;pred=+b.dataset.v;document.querySelectorAll("#pick button").forEach(x=>x.setAttribute("aria-pressed",x===b));SFX.tick();document.getElementById("go").disabled=trial>=3});
+function reset(){time=0;stress=0;D=0;off=0;D0=0;slipped=false;slipT=0;shake=0;seis=[];draw()}
+function finishTrial(){
+  running=false;const row=document.getElementById("obs").children[trial];const act=Math.round(slipTime*10)/10;const okp=Math.abs(act-pred)<=.5;
+  row.innerHTML=`<td>${["الأولى","الثانية","الثالثة"][trial]}</td><td>${ar(pred)} ث</td><td>${ar(act.toFixed(1))} ث</td><td>${okp?"نعم":"لا"}</td>`;
+  trial++;pred=0;document.querySelectorAll("#pick button").forEach(x=>x.setAttribute("aria-pressed","false"));
+  const go=document.getElementById("go");go.disabled=true;go.textContent=trial<3?"٢. ابدئي دفع الصفيحتين":"انتهت المحاولات الثلاث";
+  gate1();
+}
+let slipTime=0;
+function run(){
+  if(running||!pred||trial>=3)return;reset();running=true;document.getElementById("go").disabled=true;
+  const thr=STR[trial];let last=performance.now();
+  const tick=now=>{
+    const dt=Math.min(.05,(now-last)/1000);last=now;
+    if(!slipped){time+=dt;stress=time*RATE;D=DMAX*stress;seis.push((Math.random()-.5)*1.2);
+      if(stress>=thr){slipped=true;slipTime=time;D0=D;SFX.boom();shake=10}}
+    else{slipT+=dt;const k=Math.min(1,slipT/.25);off=D0*k;D=D0*(1-k);stress=Math.max(0,stress-dt*1.6);shake=Math.max(0,10-slipT*7);const a=Math.max(0,24*(1-slipT/1.6));seis.push(Math.sin(slipT*60)*a*(.6+Math.random()*.4));seis.push(Math.sin(slipT*60+1)*a*(.6+Math.random()*.4))}
+    seis=seis.slice(-300);
+    clock.textContent=`الزمن: ${ar((slipped?slipTime:time).toFixed(1))} ث`;
+    draw();
+    if(slipped&&slipT>1.8){shake=0;draw();finishTrial();return}
+    requestAnimationFrame(tick)};
+  if(reduce){slipTime=thr/RATE;time=slipTime;stress=0;slipped=true;slipT=2;off=DMAX*thr;D=0;SFX.boom();clock.textContent=`الزمن: ${ar(slipTime.toFixed(1))} ث`;draw();finishTrial();return}
+  requestAnimationFrame(tick);
+}
+
+document.getElementById("go").onclick=run;
+draw();
+
+/* tasks */
+const task=document.getElementById("task"),stepsEl=[...document.querySelectorAll("#steps li")];
+function el(h){const tp=document.createElement("template");tp.innerHTML=h.trim();return tp.content}
+function setStep(i){stepsEl.forEach((li,k)=>{li.className=k<i?"done":k===i?"now":""})}
+function quiz(title,text,opts,right,hint,ok,next){
+  task.replaceChildren(el(`<h2>${title}</h2><p>${text}</p><div class="opts">${opts.map((o,i)=>`<button class="opt" id="q${i}" data-i="${i}">${o}</button>`).join("")}</div><div class="fb" hidden></div>`));
+  const fb=task.querySelector(".fb");
+  task.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{
+    if(+b.dataset.i===right){SFX.good();task.querySelectorAll(".opt").forEach(x=>x.disabled=true);b.classList.add("right");fb.hidden=false;fb.className="fb ok";fb.textContent=ok;
+      const n=document.createElement("button");n.className="btn";n.textContent="التالي";n.onclick=next;task.append(n);n.focus()}
+    else{SFX.bad();b.classList.add("wrong");b.disabled=true;fb.hidden=false;fb.className="fb no";fb.textContent=hint}
+  });
+}
+function gate1(){const g=document.getElementById("gt");if(!g)return;g.textContent=`أجريتِ ${"٠١٢٣"[trial]} من ٣ محاولات`;document.getElementById("gn").disabled=trial<3}
+function st1(){setStep(0);
+  task.replaceChildren(el(`<h2>المرحلة الأولى: جرّبي وتوقّعي</h2><p>هذا منظر من أعلى لطريق يعبر صدعاً بين صفيحتين تتحركان في اتجاهين متعاكسين. راقبي الطريق: كيف ينثني ببطء؟ ومتى ينكسر؟ في كل محاولة: اختاري توقّعك أولاً، ثم ابدئي الدفع وراقبي مؤشر الإجهاد. كرّري ثلاث مرات.</p><p class="lbl" id="gt"></p><button class="btn" id="gn" disabled>التالي</button>`));
+  document.getElementById("gn").onclick=st2;gate1()}
+function st2(){setStep(1);
+  quiz("المرحلة الثانية: ماذا لاحظتِ؟","انظري إلى الجدول. هل حدث الزلزال في الوقت نفسه في المحاولات الثلاث؟",["نعم، في الوقت نفسه تماماً","لا، اختلف وقت حدوثه في كل محاولة رغم أن الدفع كان متماثلاً"],1,"قارني أرقام عمود «متى حدث الزلزال فعلاً؟».","صحيح! مقاومة الصخور تختلف من مرة لأخرى ولا يمكن معرفتها مسبقاً، فيختلف وقت الانكسار.",()=>
+  quiz("المرحلة الثانية: ماذا لاحظتِ؟","ماذا كان يحدث في الصخور قبل لحظة الزلزال مباشرة؟",["لم يكن يحدث شيء","كانت الصخور تنثني ببطء ويتراكم فيها الإجهاد، ثم انكسرت فجأة","كانت الصفيحتان تتباعدان بسرعة"],1,"راقبي الطريق ومؤشر الإجهاد قبل لحظة الزلزال.","أحسنتِ! انثنى الطريق ببطء لأن الصخور عالقة عند الصدع ويتراكم فيها الإجهاد، ثم انكسرت فجأة وتحررت الطاقة على شكل موجات زلزالية.",st3))}
+function st3(){setStep(2);
+  const A=[["لأنّ الإجهاد يتراكم في الصخور ببطء ويتحرر فجأة عند انكسارها، ولا نعرف مسبقاً مقدار ما تتحمله الصخور",1],["لأنّ أجهزة الرصد تتعطل دائماً",0],["لأنّ الزلازل لا تحدث إلا في الليل",0]];
+  const B=[["لذلك لا يستطيع العلماء تحديد الوقت الدقيق لحدوث الزلزال",1],["لذلك يستطيع العلماء معرفة وقت الزلزال بالدقيقة",0],["لذلك لا تحدث الزلازل عند حدود الصفائح",0]];
+  task.replaceChildren(el(`<h2>المرحلة الثالثة: ابني التعليل</h2><p>علّلي: لم يتوصل العلماء إلى توقّع دقيق لوقت حدوث الزلزال. اختاري الجزء المناسب لكل خانة.</p><div class="build"><div class="slot" id="sa"><b>السبب:</b><span>اختاري من القائمة الأولى</span></div><div class="chips" id="ca">${A.map((a,i)=>`<button class="chip" id="a${i}" data-ok="${a[1]}">${a[0]}</button>`).join("")}</div><div class="slot" id="sb"><b>النتيجة:</b><span>اختاري من القائمة الثانية</span></div><div class="chips" id="cb">${B.map((a,i)=>`<button class="chip" id="b${i}" data-ok="${a[1]}">${a[0]}</button>`).join("")}</div></div><div class="fb" hidden id="fb3"></div>`));
+  let got=0;const fb=document.getElementById("fb3");
+  const wire=(box,slot)=>document.querySelectorAll(`#${box} .chip`).forEach(c=>c.onclick=()=>{
+    if(c.dataset.ok==="1"){SFX.good();const s=document.getElementById(slot);s.querySelector("span").textContent=c.textContent;s.classList.add("filled");document.getElementById(box).remove();got++;fb.hidden=true;
+      if(got===2){const m=el(`<div class="model"><b>التعليل الكامل:</b> لأنّ الإجهاد يتراكم في الصخور ببطء ويتحرر فجأة عند انكسارها، ولا نعرف مسبقاً مقدار ما تتحمله الصخور، لذلك لا يستطيع العلماء تحديد الوقت الدقيق لحدوث الزلزال.</div><button class="btn" id="n3">التالي</button>`);task.append(m);document.getElementById("n3").onclick=st4}}
+    else{SFX.bad();c.classList.add("wrong");c.disabled=true;fb.hidden=false;fb.className="fb no";fb.textContent="هذا الجزء لا يفسّر ما شاهدتِه في المعمل. جرّبي غيره."}});
+  wire("ca","sa");wire("cb","sb");
+}
+function st4(){setStep(3);
+  quiz("المرحلة الرابعة: ماذا يستطيع العلماء أن يفعلوا؟","ما دام وقت الزلزال لا يمكن تحديده بدقة، فما الذي يستطيع العلماء فعله؟",["لا شيء على الإطلاق","تحديد المناطق المعرّضة للزلازل مثل حدود الصفائح، ومراقبتها بأجهزة الرصد، ووضع أنظمة إنذار مبكر وقواعد بناء مقاومة","منع حدوث الزلازل تماماً"],1,"تذكّري: نعرف «أين» تكثر الزلازل، لكن لا نعرف «متى» بالضبط.","صحيح! نعرف أين تكثر الزلازل، فنستعد لها، حتى لو لم نعرف موعدها بدقة.",finish)}
+function finish(){SFX.win();stepsEl.forEach(li=>li.className="done");task.classList.add("done-card");
+  task.replaceChildren(el(`<h2>أنهيتِ المعمل</h2><p>رمز الإنجاز الخاص بهذا المعمل:</p><div class="code">${CODE}</div><p>عودي إلى النموذج واكتبي هذا الرمز، ثم اكتبي التعليل بأسلوبك.</p><h2>ما تعلمتِه</h2><ul class="learned"><li>يتراكم الإجهاد في الصخور ببطء عند الصدوع.</li><li>عندما يتجاوز الإجهاد ما تتحمله الصخور، تنكسر فجأة ويحدث الزلزال.</li><li>لا نعرف مسبقاً مقدار ما تتحمله الصخور، لذلك لا يمكن تحديد وقت الزلزال بدقة.</li><li>نستطيع معرفة أماكن الزلازل المتوقعة والاستعداد لها.</li></ul>`))}
+st1();
+</script>
