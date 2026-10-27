@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>[hidden]{display:none!important}</style>
+<title>معمل الطريقة العلمية</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#f3f1ec; --surface:#ffffff; --ink:#1f2328; --muted:#5d6570; --line:#d9d4c9;
+  --stage:#e8eef2; --accent:#0f6e8c; --accent-soft:#dcedf3; --warm:#c2410c; --warm-soft:#fde9dc;
+  --ok:#1f7a4d; --ok-soft:#dff1e7; --bad:#b42318; --bad-soft:#fbe4e1;
+  --acid:#d1344a; --base:#2b5fd9; --neutral:#2f9e5a; --water:#7fb8e6; --glass:#c9d6de;
+  --display:"Readex Pro","IBM Plex Sans Arabic",Tahoma,sans-serif;
+  --body:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#14171b; --surface:#1c2026; --ink:#eceff3; --muted:#a3abb6; --line:#2e343c;
+  --stage:#1a242c; --accent:#5cc0e0; --accent-soft:#16323d; --warm:#ff8a4c; --warm-soft:#3b2116;
+  --ok:#5fd39a; --ok-soft:#173326; --bad:#ff8a7a; --bad-soft:#3a1d1a;
+  --acid:#ff6b7f; --base:#7aa2ff; --neutral:#5fd39a; --water:#3d6f99; --glass:#4a5863; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14171b; --surface:#1c2026; --ink:#eceff3; --muted:#a3abb6; --line:#2e343c;
+  --stage:#1a242c; --accent:#5cc0e0; --accent-soft:#16323d; --warm:#ff8a4c; --warm-soft:#3b2116;
+  --ok:#5fd39a; --ok-soft:#173326; --bad:#ff8a7a; --bad-soft:#3a1d1a;
+  --acid:#ff6b7f; --base:#7aa2ff; --neutral:#5fd39a; --water:#3d6f99; --glass:#4a5863; color-scheme:dark}
+html{direction:rtl}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.7}
+.wrap{max-width:860px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+.wrap>header{display:flex;flex-direction:column;gap:4px;padding-inline-end:110px}
+.eyebrow{font-size:13px;color:var(--muted)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(24px,5vw,32px);line-height:1.3;margin:0;text-wrap:balance}
+.steps{display:flex;gap:6px;list-style:none;margin:6px 0 0;padding:0}
+.steps li{flex:1;height:6px;border-radius:3px;background:var(--line)}
+.steps li.done{background:var(--accent)}
+.steps li.now{background:var(--warm)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.card h2{font-family:var(--display);font-weight:500;font-size:20px;margin:0}
+.card h3{font-family:var(--display);font-weight:500;font-size:17px;margin:0}
+.card p{margin:0;max-width:68ch}
+.muted{color:var(--muted);font-size:14px}
+.stage{background:var(--stage);border-radius:10px;overflow:hidden;position:relative}
+.stage svg{display:block;width:100%;height:auto}
+.opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:right;background:var(--bg);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.opt[disabled]{cursor:default}
+button:focus-visible,.chip:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn{font:inherit;font-weight:600;background:var(--warm);color:#fff;border:0;border-radius:10px;padding:12px 18px;cursor:pointer;align-self:flex-start}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.alt{background:var(--accent)}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.fb{border-radius:10px;padding:10px 14px;font-size:15px}
+.fb.ok{background:var(--ok-soft);color:var(--ok)}
+.fb.no{background:var(--bad-soft);color:var(--bad)}
+.fb.info{background:var(--accent-soft);color:var(--ink)}
+.done-card{border:2px solid var(--ok)}
+.code{font-family:var(--display);font-weight:700;font-size:44px;letter-spacing:.15em;direction:ltr;text-align:center;background:var(--ok-soft);color:var(--ok);border-radius:12px;padding:10px;font-variant-numeric:tabular-nums}
+ul.learned{margin:0;padding-inline-start:20px;display:grid;gap:4px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:15px;background:var(--surface);color:var(--ink);border:1.5px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--warm);background:var(--warm-soft)}
+.chip.placed{opacity:.35;cursor:default}
+.bins{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.bin{font:inherit;text-align:right;background:var(--bg);color:var(--ink);border:2px dashed var(--line);border-radius:12px;padding:10px 12px;min-height:96px;display:flex;flex-direction:column;gap:6px;cursor:pointer}
+.bin b{font-family:var(--display);font-weight:500;font-size:15px}
+.bin .in{display:flex;flex-wrap:wrap;gap:4px}
+.bin .in span{font-size:13px;background:var(--ok-soft);color:var(--ok);border-radius:999px;padding:2px 10px}
+.bin.ready{border-color:var(--warm)}
+.tablebox{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:460px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right}
+th{font-weight:600;color:var(--muted);font-size:13px}
+td.empty{color:var(--muted)}
+.slider{display:flex;flex-direction:column;gap:4px}
+.slider label{font-size:14px;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.slider output{font-variant-numeric:tabular-nums;color:var(--ink);font-weight:600}
+input[type=range]{width:100%;accent-color:var(--warm)}
+.seg{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:6px}
+.seg button{font:inherit;font-size:15px;background:var(--bg);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:8px 6px;cursor:pointer;line-height:1.35}
+.seg button small{display:block;color:var(--muted);font-size:12px}
+.seg button[aria-pressed="true"]{border-color:var(--warm);background:var(--warm-soft)}
+.seg button.tried{border-style:solid}
+.seg button.tried::after{content:" ✓";color:var(--ok);font-size:12px}
+.order{display:grid;gap:6px;counter-reset:n;padding:0;margin:0;list-style:none}
+.order li{background:var(--ok-soft);color:var(--ok);border-radius:10px;padding:8px 12px;counter-increment:n}
+.order li::before{content:counter(n) ". ";font-weight:700}
+.order li.slot{background:var(--bg);color:var(--muted);border:1.5px dashed var(--line)}
+.order li.slot::before{color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
+
+
+</style>
+<div class="wrap">
+<header><span class="eyebrow">معمل افتراضي · ثاني متوسط · طبيعة العلم</span><h1>خطوات الطريقة العلمية</h1><ul class="steps" id="steps" aria-hidden="true"></ul></header>
+<main id="main" style="display:flex;flex-direction:column;gap:16px"></main>
+</div>
+<style>
+.fxglow{position:fixed;inset:0;pointer-events:none;z-index:30;opacity:0}
+.fxglow.ok{box-shadow:inset 0 0 0 6px #2fbf71,inset 0 0 90px 30px rgba(47,191,113,.55);animation:fxg 1s ease-out}
+.fxglow.no{box-shadow:inset 0 0 0 6px #e5484d,inset 0 0 90px 30px rgba(229,72,77,.45);animation:fxg .8s ease-out}
+@keyframes fxg{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
+.fxbadge{position:fixed;left:50%;top:40%;z-index:31;pointer-events:none;font-family:var(--display);font-weight:700;font-size:42px;color:#fff;background:#1f9d5c;padding:8px 30px;border-radius:999px;opacity:0;transform:translate(-50%,-50%) scale(.6)}
+.fxbadge.show{animation:fxb 1.1s ease-out}
+@keyframes fxb{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}35%{transform:translate(-50%,-50%) scale(1)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
+@media (prefers-reduced-motion:reduce){.fxbadge.show{animation:none;opacity:0}.fxglow.ok,.fxglow.no{animation-duration:.01s}}
+.wrap>header{padding-inline-end:110px}
+.sndbtn{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:calc(10px + env(safe-area-inset-left,0px));z-index:20;font:inherit;font-size:14px;background:var(--surface);color:var(--ink);border:1.5px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer}
+.sndbtn:focus-visible{outline:3px solid var(--plate);outline-offset:2px}
+</style>
+<button class="sndbtn" id="sndbtn" aria-pressed="true">الصوت: يعمل</button>
+<script>
+const SFX=(()=>{
+  let ac=null,on=true;
+  const btn=document.getElementById("sndbtn");
+  btn.onclick=()=>{on=!on;btn.setAttribute("aria-pressed",on);btn.textContent=on?"الصوت: يعمل":"الصوت: متوقف";};
+  const A=()=>{if(!on)return null;try{if(!ac)ac=new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();return ac}catch(e){return null}};
+  function tone(f,t0,d,type,vol,f2){const c=A();if(!c)return;const o=c.createOscillator(),g=c.createGain();o.type=type||"sine";o.frequency.setValueAtTime(f,c.currentTime+t0);if(f2)o.frequency.exponentialRampToValueAtTime(f2,c.currentTime+t0+d);g.gain.setValueAtTime(0,c.currentTime+t0);g.gain.linearRampToValueAtTime(vol||.2,c.currentTime+t0+.02);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t0+d);o.connect(g).connect(c.destination);o.start(c.currentTime+t0);o.stop(c.currentTime+t0+d+.05)}
+  function noise(t0,d,vol,fType,fFreq,fEnd){const c=A();if(!c)return;const n=c.sampleRate*d,b=c.createBuffer(1,n,c.sampleRate),x=b.getChannelData(0);for(let i=0;i<n;i++)x[i]=Math.random()*2-1;const s=c.createBufferSource();s.buffer=b;const f=c.createBiquadFilter();f.type=fType||"lowpass";f.frequency.setValueAtTime(fFreq||800,c.currentTime+t0);if(fEnd)f.frequency.exponentialRampToValueAtTime(fEnd,c.currentTime+t0+d);const g=c.createGain();g.gain.setValueAtTime(vol||.3,c.currentTime+t0);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t0+d);s.connect(f).connect(g).connect(c.destination);s.start(c.currentTime+t0)}
+  const fx=document.createElement("div");fx.className="fxglow";fx.setAttribute("aria-hidden","true");document.body.append(fx);
+  const badge=document.createElement("div");badge.className="fxbadge";badge.setAttribute("aria-hidden","true");badge.textContent="ممتاز";document.body.append(badge);
+  function glow(kind){fx.className="fxglow";badge.className="fxbadge";void fx.offsetWidth;fx.className="fxglow "+kind;if(kind==="ok"){void badge.offsetWidth;badge.className="fxbadge show"}}
+  const ding=()=>{tone(1318,0,.7,"sine",.22);tone(2637,0,.35,"sine",.06)};
+  const buzz=()=>{tone(150,0,.28,"square",.07,120)};
+  return{
+    good(){glow("ok");ding()},
+    bad(){glow("no");buzz()},
+    win(){glow("ok");ding();setTimeout(()=>tone(1568,0,.8,"sine",.2),220)},
+    tick(){tone(880,0,.08,"sine",.1)},
+    rumble(d,vol){noise(0,d||2,vol||.5,"lowpass",140,60)},
+    boom(){noise(0,2.5,1,"lowpass",900,40);tone(70,0,1.4,"sine",.6,30)},
+    bubble(){for(let i=0;i<10;i++)tone(300+Math.random()*500,i*.12+Math.random()*.05,.08,"sine",.07,700+Math.random()*400)},
+    hiss(d){noise(0,d||1.5,.15,"highpass",3000)},
+    whoosh(){noise(0,.6,.25,"bandpass",400,2400)},
+    thud(){tone(110,0,.25,"sine",.35,50)},
+  };
+})();
+</script>
+<script>
+// Shared helpers for all labs
+const $=(s,r=document)=>r.querySelector(s);
+const el=(html)=>{const t=document.createElement("template");t.innerHTML=html.trim();return t.content.childElementCount===1?t.content.firstElementChild:t.content};
+const shuffle=(a)=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
+const SVGNS="http://www.w3.org/2000/svg";
+function sv(tag,attrs,parent){const e=document.createElementNS(SVGNS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.append(e);return e}
+
+// Step bar
+function setSteps(n,total){const ul=$("#steps");ul.replaceChildren();for(let i=0;i<total;i++){const li=document.createElement("li");if(i<n)li.className="done";else if(i===n)li.className="now";ul.append(li)}}
+
+// Multiple-choice: must reach the right answer to continue. Returns promise resolved on correct.
+// opts: [{t:"text", ok:true/false, why:"explanation"}]
+function mcq(host,{q,opts,right,doShuffle=true}){
+  return new Promise(res=>{
+    const box=el(`<div class="opts" role="group"></div>`);
+    const fb=el(`<div class="fb" role="status" hidden></div>`);
+    if(q)host.append(el(`<p><b>${q}</b></p>`));
+    host.append(box,fb);
+    const list=doShuffle?shuffle(opts):opts;
+    let tries=0;
+    list.forEach(o=>{
+      const b=el(`<button class="opt" type="button">${o.t}</button>`);
+      b.onclick=()=>{
+        if(o.ok){
+          box.querySelectorAll(".opt").forEach(x=>x.disabled=true);
+          b.classList.add("right");fb.hidden=false;fb.className="fb ok";fb.textContent=right||o.why||"إجابة صحيحة.";SFX.good();res(tries)
+        }else{
+          tries++;b.classList.add("wrong");b.disabled=true;fb.hidden=false;fb.className="fb no";fb.textContent=o.why||"ليست هذه. فكّري مرة أخرى.";SFX.bad()
+        }
+      };
+      box.append(b);
+    });
+  });
+}
+
+// Tap-to-classify: pick a chip then a bin. items:[{t, bin, why}] bins:[{id,label,hint}]
+function classify(host,{items,bins,onPick}){
+  return new Promise(res=>{
+    const chips=el(`<div class="chips" aria-label="البطاقات"></div>`);
+    const binsEl=el(`<div class="bins"></div>`);
+    const fb=el(`<div class="fb info" role="status">اختاري بطاقة، ثم اختاري المجموعة المناسبة لها.</div>`);
+    host.append(chips,binsEl,fb);
+    let sel=null,left=items.length;
+    const binBtns={};
+    bins.forEach(b=>{
+      const bb=el(`<button class="bin" type="button"><b>${b.label}</b>${b.hint?`<span class="muted">${b.hint}</span>`:""}<span class="in"></span></button>`);
+      bb.onclick=()=>{
+        if(!sel){fb.className="fb info";fb.textContent="اختاري بطاقة أولاً.";return}
+        const it=sel.item;
+        if(it.bin===b.id){
+          bb.querySelector(".in").append(el(`<span>${it.t}</span>`));
+          sel.btn.classList.add("placed");sel.btn.disabled=true;sel.btn.setAttribute("aria-pressed","false");
+          fb.className="fb ok";fb.textContent=it.why||"صحيح.";SFX.good();sel=null;left--;
+          Object.values(binBtns).forEach(x=>x.classList.remove("ready"));
+          if(left===0)res();
+        }else{
+          fb.className="fb no";fb.textContent=it.hintWrong||"ليست هذه المجموعة. انظري إلى المادة مرة أخرى.";SFX.bad();
+        }
+      };
+      binBtns[b.id]=bb;binsEl.append(bb);
+    });
+    shuffle(items).forEach(it=>{
+      const c=el(`<button class="chip" type="button" aria-pressed="false">${it.t}</button>`);
+      c.onclick=()=>{
+        chips.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed","false"));
+        c.setAttribute("aria-pressed","true");sel={item:it,btn:c};SFX.tick();
+        Object.values(binBtns).forEach(x=>x.classList.add("ready"));
+        fb.className="fb info";fb.textContent="«"+it.t+"»: إلى أي مجموعة تنتمي؟";
+        if(onPick)onPick(it);
+      };
+      chips.append(c);
+    });
+  });
+}
+
+// Final screen with code
+function finish(task,code,learned){
+  SFX.win();
+  task.classList.add("done-card");
+  task.replaceChildren(el(`<div><h2>أنهيتِ المعمل</h2><p>رمز الإنجاز الخاص بهذا المعمل:</p><div class="code">${code}</div><p>عودي إلى النموذج واكتبي هذا الرمز، ثم أجيبي عن السؤال.</p><h2 style="margin-top:12px">ما تعلمتِه</h2><ul class="learned">${learned.map(x=>`<li>${x}</li>`).join("")}</ul></div>`));
+  task.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+</script>
+<script>
+const CODE="3861";
+const main=$("#main");
+const TOTAL=4;
+
+const STEPS=[
+ {n:"تحديد المشكلة",s:"لاحظت الطالبات أن نبتة الصف تذبل، فسألن: «لماذا تذبل نبتة الصف؟»",hint:"كل بحث علمي يبدأ بسؤال أو مشكلة نريد حلّها."},
+ {n:"تكوين فرضية",s:"توقّعن: «إذا وُضعت النبتة في مكان مشمس، فإنها لن تذبل».",hint:"بعد تحديد المشكلة نضع توقّعاً قابلاً للاختبار."},
+ {n:"اختبار الفرضية",s:"وضعن نبتتين متماثلتين: واحدة قرب النافذة وأخرى في الظل، وسقينهما بالكمية نفسها.",hint:"بعد الفرضية نصمّم تجربة لاختبارها."},
+ {n:"تحليل البيانات",s:"قِسن طول النبتتين كل يومين، ونظّمن القياسات في جدول ورسم بياني.",hint:"بعد التجربة نجمع القياسات وننظّمها."},
+ {n:"استخلاص النتائج",s:"وجدن أن النبتة قرب النافذة نمت ولم تذبل، فالفرضية مدعومة.",hint:"بعد تحليل البيانات نستخلص النتيجة ونقارنها بالفرضية."},
+ {n:"التواصل ونشر النتائج",s:"عرضن ما توصّلن إليه على زميلاتهن في الإذاعة المدرسية.",hint:"آخر خطوة: مشاركة النتائج مع الآخرين."},
+];
+
+function stage1(){
+  setSteps(0,TOTAL);
+  const card=el(`<section class="card"><h2>١. رتّبي خطوات الطريقة العلمية</h2>
+  <p>هذه قصة طالبات الصف مع نبتة تذبل. اختاري البطاقات <b>بالترتيب الصحيح</b>، من الخطوة الأولى إلى الأخيرة.</p>
+  <ol class="order" id="ord"></ol>
+  <div id="pool" style="display:grid;gap:8px"></div>
+  <div id="s1f"></div></section>`);
+  main.append(card);
+  const ord=$("#ord",card),pool=$("#pool",card),f=$("#s1f",card);
+  let next=0;
+  function slots(){ord.replaceChildren();STEPS.forEach((s,i)=>ord.append(el(i<next?`<li><b>${s.n}:</b> ${s.s}</li>`:`<li class="slot">…</li>`)))}
+  slots();
+  shuffle(STEPS.map((s,i)=>({...s,i}))).forEach(s=>{
+    const b=el(`<button class="opt" type="button">${s.s}</button>`);
+    b.onclick=()=>{
+      if(s.i===next){b.remove();next++;slots();SFX.good();f.replaceChildren(el(`<div class="fb ok">صحيح: <b>${s.n}</b>.</div>`));if(next===STEPS.length)done()}
+      else{SFX.bad();f.replaceChildren(el(`<div class="fb no">ليست هذه الخطوة رقم ${next+1}. ${STEPS[next].hint}</div>`))}
+    };
+    pool.append(b);
+  });
+  async function done(){
+    f.append(el(`<div class="fb info" style="margin-top:8px">أكملتِ خطوات الطريقة العلمية بالترتيب.</div>`));
+    const q=el(`<div style="display:flex;flex-direction:column;gap:10px"></div>`);card.append(q);
+    await mcq(q,{q:"في قصة النبتة، ماذا فعلت الطالبات مباشرة بعد تحليل البيانات؟",opts:[
+      {t:"استخلصن النتائج",ok:true},{t:"كوّنّ فرضية",why:"الفرضية تأتي قبل التجربة."},{t:"حدّدن المشكلة",why:"هذه الخطوة الأولى."}],right:"صحيح."});
+    const n=el(`<button class="btn" type="button">التالي</button>`);q.append(n);n.onclick=()=>{n.remove();stage2()};
+  }
+}
+
+function stage2(){
+  setSteps(1,TOTAL);
+  const card=el(`<section class="card"><h2>٢. سمّي الخطوة</h2><p>ضعي كل موقف تحت اسم الخطوة التي يمثّلها.</p></section>`);
+  main.append(card);card.scrollIntoView({behavior:"smooth",block:"start"});
+  classify(card,{items:[
+    {t:"«هل يذوب السكر أسرع في الماء الساخن؟»",bin:"p",why:"صحيح. هذا سؤال يحدد المشكلة."},
+    {t:"«أتوقع أن السكر يذوب أسرع في الماء الساخن»",bin:"h",why:"صحيح. هذه فرضية: توقّع قابل للاختبار."},
+    {t:"أذابت ملعقة سكر في ماء بارد وأخرى في ماء ساخن وقاست الزمن",bin:"t",why:"صحيح. هذا اختبار الفرضية بتجربة."},
+    {t:"«ذاب السكر أسرع في الماء الساخن، فتوقّعي صحيح»",bin:"c",why:"صحيح. هذا استخلاص للنتائج."},
+    {t:"كتبت تقريراً ونشرته في مجلة المدرسة",bin:"k",why:"صحيح. هذا هو التواصل."},
+  ],bins:[
+    {id:"p",label:"تحديد المشكلة"},{id:"h",label:"تكوين فرضية"},{id:"t",label:"اختبار الفرضية"},{id:"c",label:"استخلاص النتائج"},{id:"k",label:"التواصل"}]}).then(()=>{
+    const n=el(`<button class="btn" type="button">التالي</button>`);card.append(n);n.onclick=()=>{n.remove();stage3()};
+  });
+}
+
+async function stage3(){
+  setSteps(2,TOTAL);
+  const card=el(`<section class="card"><h2>٣. العالِمة الأمينة</h2>
+  <p>كرّرت لمى تجربة السكر، فجاءت إحدى النتائج مختلفة عمّا توقعته.</p></section>`);
+  main.append(card);card.scrollIntoView({behavior:"smooth",block:"start"});
+  await mcq(card,{q:"ماذا تفعل لمى؟",opts:[
+    {t:"تعيد التجربة بعناية وتسجّل النتائج كما هي، وقد تعدّل فرضيتها",ok:true},
+    {t:"تغيّر النتائج المسجلة لتوافق فرضيتها",why:"تغيير النتائج ليس من خطوات الطريقة العلمية، بل يخالف الأمانة العلمية."},
+    {t:"تحذف النتيجة المختلفة ولا تذكرها",why:"العالِم يسجّل كل النتائج بأمانة."}],right:"صحيح. الأمانة العلمية أساس العلم."});
+  await mcq(card,{q:"لماذا يكرر العلماء التجربة أكثر من مرة؟",opts:[
+    {t:"لتقليل احتمال حدوث خطأ والتأكد من النتائج",ok:true},
+    {t:"لتغيير الضوابط في كل مرة",why:"الضوابط (الثوابت) تبقى كما هي عند تكرار التجربة."},
+    {t:"لأن المرة الأولى دائماً خاطئة",why:"ليس كذلك، لكن التكرار يجعلنا أكثر ثقة بالنتيجة."}],right:"صحيح."});
+  card.append(el(`<h3 style="margin-top:6px">العلم والتقنية</h3><p class="muted">يستخدم العلماء أدوات تقنية تساعدهم في البحث. صِلي كل أداة بما تساعد عليه.</p>`));
+  await classify(card,{items:[
+    {t:"رادار يخترق الأرض",bin:"arch",why:"صحيح. يساعد عالِم الآثار على رؤية ما هو مطمور قبل الحفر."},
+    {t:"المجهر",bin:"cell",why:"صحيح. لرؤية الخلايا والأشياء الدقيقة."},
+    {t:"التلسكوب",bin:"sky",why:"صحيح. لرصد الكواكب والنجوم."},
+    {t:"الحاسوب",bin:"data",why:"صحيح. لتنظيم البيانات وتحليلها وتخزينها."},
+  ],bins:[
+    {id:"arch",label:"كشف الآثار المطمورة"},{id:"cell",label:"رؤية الخلايا"},{id:"sky",label:"رصد الفضاء"},{id:"data",label:"تحليل البيانات"}]});
+  setSteps(3,TOTAL);
+  const b=el(`<button class="btn alt" type="button">احصلي على رمز الإنجاز</button>`);card.append(b);
+  b.onclick=()=>{setSteps(TOTAL,TOTAL);b.remove();const t=el(`<section class="card"></section>`);main.append(t);finish(t,CODE,[
+    "خطوات الطريقة العلمية: تحديد المشكلة، ثم تكوين فرضية، ثم اختبارها، ثم تحليل البيانات، ثم استخلاص النتائج، ثم التواصل.",
+    "الخطوة الأولى دائماً تحديد المشكلة.",
+    "تغيير النتائج ليس من خطوات الطريقة العلمية؛ العالِم يسجّل نتائجه بأمانة.",
+    "نكرر التجربة لتقليل احتمال حدوث خطأ.",
+    "التقنية تساعد العلماء، مثل الرادار الذي يكشف الآثار المطمورة."])};
+}
+
+main.append(el(`<section class="card"><p>في هذا المعمل تتبعين قصة بحث علمي حقيقي خطوة بخطوة، وتتعلمين كيف يفكّر العلماء ويعملون بأمانة.</p></section>`));
+stage1();
+window.__labstep=async()=>{
+  const pool=document.getElementById("pool");
+  if(pool&&pool.children.length){for(const s of STEPS){const b=[...pool.children].find(x=>x.textContent===s.s);if(b){b.click();await sleep(40)}}return true}
+  return false;
+};
+
+</script>

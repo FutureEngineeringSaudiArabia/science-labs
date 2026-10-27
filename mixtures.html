@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>[hidden]{display:none!important}</style>
+<title>معمل المخاليط</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#f3f1ec; --surface:#ffffff; --ink:#1f2328; --muted:#5d6570; --line:#d9d4c9;
+  --stage:#e8eef2; --accent:#0f6e8c; --accent-soft:#dcedf3; --warm:#c2410c; --warm-soft:#fde9dc;
+  --ok:#1f7a4d; --ok-soft:#dff1e7; --bad:#b42318; --bad-soft:#fbe4e1;
+  --acid:#d1344a; --base:#2b5fd9; --neutral:#2f9e5a; --water:#7fb8e6; --glass:#c9d6de;
+  --display:"Readex Pro","IBM Plex Sans Arabic",Tahoma,sans-serif;
+  --body:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#14171b; --surface:#1c2026; --ink:#eceff3; --muted:#a3abb6; --line:#2e343c;
+  --stage:#1a242c; --accent:#5cc0e0; --accent-soft:#16323d; --warm:#ff8a4c; --warm-soft:#3b2116;
+  --ok:#5fd39a; --ok-soft:#173326; --bad:#ff8a7a; --bad-soft:#3a1d1a;
+  --acid:#ff6b7f; --base:#7aa2ff; --neutral:#5fd39a; --water:#3d6f99; --glass:#4a5863; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14171b; --surface:#1c2026; --ink:#eceff3; --muted:#a3abb6; --line:#2e343c;
+  --stage:#1a242c; --accent:#5cc0e0; --accent-soft:#16323d; --warm:#ff8a4c; --warm-soft:#3b2116;
+  --ok:#5fd39a; --ok-soft:#173326; --bad:#ff8a7a; --bad-soft:#3a1d1a;
+  --acid:#ff6b7f; --base:#7aa2ff; --neutral:#5fd39a; --water:#3d6f99; --glass:#4a5863; color-scheme:dark}
+html{direction:rtl}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.7}
+.wrap{max-width:860px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+.wrap>header{display:flex;flex-direction:column;gap:4px;padding-inline-end:110px}
+.eyebrow{font-size:13px;color:var(--muted)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(24px,5vw,32px);line-height:1.3;margin:0;text-wrap:balance}
+.steps{display:flex;gap:6px;list-style:none;margin:6px 0 0;padding:0}
+.steps li{flex:1;height:6px;border-radius:3px;background:var(--line)}
+.steps li.done{background:var(--accent)}
+.steps li.now{background:var(--warm)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.card h2{font-family:var(--display);font-weight:500;font-size:20px;margin:0}
+.card h3{font-family:var(--display);font-weight:500;font-size:17px;margin:0}
+.card p{margin:0;max-width:68ch}
+.muted{color:var(--muted);font-size:14px}
+.stage{background:var(--stage);border-radius:10px;overflow:hidden;position:relative}
+.stage svg{display:block;width:100%;height:auto}
+.opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:right;background:var(--bg);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.opt[disabled]{cursor:default}
+button:focus-visible,.chip:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn{font:inherit;font-weight:600;background:var(--warm);color:#fff;border:0;border-radius:10px;padding:12px 18px;cursor:pointer;align-self:flex-start}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.alt{background:var(--accent)}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.fb{border-radius:10px;padding:10px 14px;font-size:15px}
+.fb.ok{background:var(--ok-soft);color:var(--ok)}
+.fb.no{background:var(--bad-soft);color:var(--bad)}
+.fb.info{background:var(--accent-soft);color:var(--ink)}
+.done-card{border:2px solid var(--ok)}
+.code{font-family:var(--display);font-weight:700;font-size:44px;letter-spacing:.15em;direction:ltr;text-align:center;background:var(--ok-soft);color:var(--ok);border-radius:12px;padding:10px;font-variant-numeric:tabular-nums}
+ul.learned{margin:0;padding-inline-start:20px;display:grid;gap:4px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:15px;background:var(--surface);color:var(--ink);border:1.5px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--warm);background:var(--warm-soft)}
+.chip.placed{opacity:.35;cursor:default}
+.bins{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.bin{font:inherit;text-align:right;background:var(--bg);color:var(--ink);border:2px dashed var(--line);border-radius:12px;padding:10px 12px;min-height:96px;display:flex;flex-direction:column;gap:6px;cursor:pointer}
+.bin b{font-family:var(--display);font-weight:500;font-size:15px}
+.bin .in{display:flex;flex-wrap:wrap;gap:4px}
+.bin .in span{font-size:13px;background:var(--ok-soft);color:var(--ok);border-radius:999px;padding:2px 10px}
+.bin.ready{border-color:var(--warm)}
+.tablebox{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:460px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right}
+th{font-weight:600;color:var(--muted);font-size:13px}
+td.empty{color:var(--muted)}
+.slider{display:flex;flex-direction:column;gap:4px}
+.slider label{font-size:14px;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.slider output{font-variant-numeric:tabular-nums;color:var(--ink);font-weight:600}
+input[type=range]{width:100%;accent-color:var(--warm)}
+.seg{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:6px}
+.seg button{font:inherit;font-size:15px;background:var(--bg);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:8px 6px;cursor:pointer;line-height:1.35}
+.seg button small{display:block;color:var(--muted);font-size:12px}
+.seg button[aria-pressed="true"]{border-color:var(--warm);background:var(--warm-soft)}
+.seg button.tried{border-style:solid}
+.seg button.tried::after{content:" ✓";color:var(--ok);font-size:12px}
+.order{display:grid;gap:6px;counter-reset:n;padding:0;margin:0;list-style:none}
+.order li{background:var(--ok-soft);color:var(--ok);border-radius:10px;padding:8px 12px;counter-increment:n}
+.order li::before{content:counter(n) ". ";font-weight:700}
+.order li.slot{background:var(--bg);color:var(--muted);border:1.5px dashed var(--line)}
+.order li.slot::before{color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
+
+
+</style>
+<div class="wrap">
+<header><span class="eyebrow">معمل افتراضي · ثاني متوسط · المخاليط والمحاليل</span><h1>المخاليط والمواد النقية</h1><ul class="steps" id="steps" aria-hidden="true"></ul></header>
+<main id="main" style="display:flex;flex-direction:column;gap:16px"></main>
+</div>
+<style>
+.fxglow{position:fixed;inset:0;pointer-events:none;z-index:30;opacity:0}
+.fxglow.ok{box-shadow:inset 0 0 0 6px #2fbf71,inset 0 0 90px 30px rgba(47,191,113,.55);animation:fxg 1s ease-out}
+.fxglow.no{box-shadow:inset 0 0 0 6px #e5484d,inset 0 0 90px 30px rgba(229,72,77,.45);animation:fxg .8s ease-out}
+@keyframes fxg{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
+.fxbadge{position:fixed;left:50%;top:40%;z-index:31;pointer-events:none;font-family:var(--display);font-weight:700;font-size:42px;color:#fff;background:#1f9d5c;padding:8px 30px;border-radius:999px;opacity:0;transform:translate(-50%,-50%) scale(.6)}
+.fxbadge.show{animation:fxb 1.1s ease-out}
+@keyframes fxb{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}35%{transform:translate(-50%,-50%) scale(1)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
+@media (prefers-reduced-motion:reduce){.fxbadge.show{animation:none;opacity:0}.fxglow.ok,.fxglow.no{animation-duration:.01s}}
+.wrap>header{padding-inline-end:110px}
+.sndbtn{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:calc(10px + env(safe-area-inset-left,0px));z-index:20;font:inherit;font-size:14px;background:var(--surface);color:var(--ink);border:1.5px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer}
+.sndbtn:focus-visible{outline:3px solid var(--plate);outline-offset:2px}
+</style>
+<button class="sndbtn" id="sndbtn" aria-pressed="true">الصوت: يعمل</button>
+<script>
+const SFX=(()=>{
+  let ac=null,on=true;
+  const btn=document.getElementById("sndbtn");
+  btn.onclick=()=>{on=!on;btn.setAttribute("aria-pressed",on);btn.textContent=on?"الصوت: يعمل":"الصوت: متوقف";};
+  const A=()=>{if(!on)return null;try{if(!ac)ac=new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();return ac}catch(e){return null}};
+  function tone(f,t0,d,type,vol,f2){const c=A();if(!c)return;const o=c.createOscillator(),g=c.createGain();o.type=type||"sine";o.frequency.setValueAtTime(f,c.currentTime+t0);if(f2)o.frequency.exponentialRampToValueAtTime(f2,c.currentTime+t0+d);g.gain.setValueAtTime(0,c.currentTime+t0);g.gain.linearRampToValueAtTime(vol||.2,c.currentTime+t0+.02);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t0+d);o.connect(g).connect(c.destination);o.start(c.currentTime+t0);o.stop(c.currentTime+t0+d+.05)}
+  function noise(t0,d,vol,fType,fFreq,fEnd){const c=A();if(!c)return;const n=c.sampleRate*d,b=c.createBuffer(1,n,c.sampleRate),x=b.getChannelData(0);for(let i=0;i<n;i++)x[i]=Math.random()*2-1;const s=c.createBufferSource();s.buffer=b;const f=c.createBiquadFilter();f.type=fType||"lowpass";f.frequency.setValueAtTime(fFreq||800,c.currentTime+t0);if(fEnd)f.frequency.exponentialRampToValueAtTime(fEnd,c.currentTime+t0+d);const g=c.createGain();g.gain.setValueAtTime(vol||.3,c.currentTime+t0);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t0+d);s.connect(f).connect(g).connect(c.destination);s.start(c.currentTime+t0)}
+  const fx=document.createElement("div");fx.className="fxglow";fx.setAttribute("aria-hidden","true");document.body.append(fx);
+  const badge=document.createElement("div");badge.className="fxbadge";badge.setAttribute("aria-hidden","true");badge.textContent="ممتاز";document.body.append(badge);
+  function glow(kind){fx.className="fxglow";badge.className="fxbadge";void fx.offsetWidth;fx.className="fxglow "+kind;if(kind==="ok"){void badge.offsetWidth;badge.className="fxbadge show"}}
+  const ding=()=>{tone(1318,0,.7,"sine",.22);tone(2637,0,.35,"sine",.06)};
+  const buzz=()=>{tone(150,0,.28,"square",.07,120)};
+  return{
+    good(){glow("ok");ding()},
+    bad(){glow("no");buzz()},
+    win(){glow("ok");ding();setTimeout(()=>tone(1568,0,.8,"sine",.2),220)},
+    tick(){tone(880,0,.08,"sine",.1)},
+    rumble(d,vol){noise(0,d||2,vol||.5,"lowpass",140,60)},
+    boom(){noise(0,2.5,1,"lowpass",900,40);tone(70,0,1.4,"sine",.6,30)},
+    bubble(){for(let i=0;i<10;i++)tone(300+Math.random()*500,i*.12+Math.random()*.05,.08,"sine",.07,700+Math.random()*400)},
+    hiss(d){noise(0,d||1.5,.15,"highpass",3000)},
+    whoosh(){noise(0,.6,.25,"bandpass",400,2400)},
+    thud(){tone(110,0,.25,"sine",.35,50)},
+  };
+})();
+</script>
+<script>
+// Shared helpers for all labs
+const $=(s,r=document)=>r.querySelector(s);
+const el=(html)=>{const t=document.createElement("template");t.innerHTML=html.trim();return t.content.childElementCount===1?t.content.firstElementChild:t.content};
+const shuffle=(a)=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
+const SVGNS="http://www.w3.org/2000/svg";
+function sv(tag,attrs,parent){const e=document.createElementNS(SVGNS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.append(e);return e}
+
+// Step bar
+function setSteps(n,total){const ul=$("#steps");ul.replaceChildren();for(let i=0;i<total;i++){const li=document.createElement("li");if(i<n)li.className="done";else if(i===n)li.className="now";ul.append(li)}}
+
+// Multiple-choice: must reach the right answer to continue. Returns promise resolved on correct.
+// opts: [{t:"text", ok:true/false, why:"explanation"}]
+function mcq(host,{q,opts,right,doShuffle=true}){
+  return new Promise(res=>{
+    const box=el(`<div class="opts" role="group"></div>`);
+    const fb=el(`<div class="fb" role="status" hidden></div>`);
+    if(q)host.append(el(`<p><b>${q}</b></p>`));
+    host.append(box,fb);
+    const list=doShuffle?shuffle(opts):opts;
+    let tries=0;
+    list.forEach(o=>{
+      const b=el(`<button class="opt" type="button">${o.t}</button>`);
+      b.onclick=()=>{
+        if(o.ok){
+          box.querySelectorAll(".opt").forEach(x=>x.disabled=true);
+          b.classList.add("right");fb.hidden=false;fb.className="fb ok";fb.textContent=right||o.why||"إجابة صحيحة.";SFX.good();res(tries)
+        }else{
+          tries++;b.classList.add("wrong");b.disabled=true;fb.hidden=false;fb.className="fb no";fb.textContent=o.why||"ليست هذه. فكّري مرة أخرى.";SFX.bad()
+        }
+      };
+      box.append(b);
+    });
+  });
+}
+
+// Tap-to-classify: pick a chip then a bin. items:[{t, bin, why}] bins:[{id,label,hint}]
+function classify(host,{items,bins,onPick}){
+  return new Promise(res=>{
+    const chips=el(`<div class="chips" aria-label="البطاقات"></div>`);
+    const binsEl=el(`<div class="bins"></div>`);
+    const fb=el(`<div class="fb info" role="status">اختاري بطاقة، ثم اختاري المجموعة المناسبة لها.</div>`);
+    host.append(chips,binsEl,fb);
+    let sel=null,left=items.length;
+    const binBtns={};
+    bins.forEach(b=>{
+      const bb=el(`<button class="bin" type="button"><b>${b.label}</b>${b.hint?`<span class="muted">${b.hint}</span>`:""}<span class="in"></span></button>`);
+      bb.onclick=()=>{
+        if(!sel){fb.className="fb info";fb.textContent="اختاري بطاقة أولاً.";return}
+        const it=sel.item;
+        if(it.bin===b.id){
+          bb.querySelector(".in").append(el(`<span>${it.t}</span>`));
+          sel.btn.classList.add("placed");sel.btn.disabled=true;sel.btn.setAttribute("aria-pressed","false");
+          fb.className="fb ok";fb.textContent=it.why||"صحيح.";SFX.good();sel=null;left--;
+          Object.values(binBtns).forEach(x=>x.classList.remove("ready"));
+          if(left===0)res();
+        }else{
+          fb.className="fb no";fb.textContent=it.hintWrong||"ليست هذه المجموعة. انظري إلى المادة مرة أخرى.";SFX.bad();
+        }
+      };
+      binBtns[b.id]=bb;binsEl.append(bb);
+    });
+    shuffle(items).forEach(it=>{
+      const c=el(`<button class="chip" type="button" aria-pressed="false">${it.t}</button>`);
+      c.onclick=()=>{
+        chips.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed","false"));
+        c.setAttribute("aria-pressed","true");sel={item:it,btn:c};SFX.tick();
+        Object.values(binBtns).forEach(x=>x.classList.add("ready"));
+        fb.className="fb info";fb.textContent="«"+it.t+"»: إلى أي مجموعة تنتمي؟";
+        if(onPick)onPick(it);
+      };
+      chips.append(c);
+    });
+  });
+}
+
+// Final screen with code
+function finish(task,code,learned){
+  SFX.win();
+  task.classList.add("done-card");
+  task.replaceChildren(el(`<div><h2>أنهيتِ المعمل</h2><p>رمز الإنجاز الخاص بهذا المعمل:</p><div class="code">${code}</div><p>عودي إلى النموذج واكتبي هذا الرمز، ثم أجيبي عن السؤال.</p><h2 style="margin-top:12px">ما تعلمتِه</h2><ul class="learned">${learned.map(x=>`<li>${x}</li>`).join("")}</ul></div>`));
+  task.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+</script>
+<script>
+const CODE="5174";
+const main=$("#main");
+const TOTAL=4;
+
+// ---------- particle "magnifier" ----------
+const COL={H:"#f2f2f2",O:"#e5484d",Na:"#8e6cd9",Cl:"#38b26b",Au:"#e0b02e",Cu:"#c8703a",Zn:"#9aa4ae",N:"#4a7bd0",sand:"#c9a46a",leaf:"#4caf50",tom:"#e5484d",cuc:"#9ccc65",pulp:"#f59e0b",juice:"#fde68a"};
+function magnifier(type){
+  const s=sv("svg",{viewBox:"0 0 360 220",role:"img","aria-label":"نموذج جسيمات المادة المختارة"});
+  const defs=sv("defs",{},s);const cp=sv("clipPath",{id:"lensclip"},defs);sv("circle",{cx:180,cy:110,r:96},cp);
+  sv("circle",{cx:180,cy:110,r:100,fill:"var(--surface)",stroke:"var(--ink)","stroke-width":4},s);
+  const g=sv("g",{"clip-path":"url(#lensclip)"},s);
+  const rnd=(a,b)=>a+Math.random()*(b-a);
+  const atom=(x,y,r,c)=>sv("circle",{cx:x,cy:y,r,fill:c,stroke:"#333","stroke-width":1},g);
+  const grid=(fn,step=26)=>{for(let y=24;y<200;y+=step)for(let x=94;x<270;x+=step)fn(x+(Math.floor(y/step)%2?step/2:0),y)};
+  if(type==="H2"){for(let i=0;i<14;i++){const x=rnd(100,255),y=rnd(30,185),a=rnd(0,6.28);atom(x,y,9,COL.H);atom(x+15*Math.cos(a),y+15*Math.sin(a),9,COL.H)}}
+  if(type==="Au"){grid((x,y)=>atom(x,y,12,COL.Au))}
+  if(type==="H2O"){for(let i=0;i<13;i++){const x=rnd(100,255),y=rnd(32,185);atom(x,y,11,COL.O);atom(x-11,y+9,6,COL.H);atom(x+11,y+9,6,COL.H)}}
+  if(type==="NaCl"){let k=0;for(let y=24;y<200;y+=24){for(let x=94;x<275;x+=24){atom(x,y,(k%2)?11:8,(k%2)?COL.Cl:COL.Na);k++}k++}}
+  if(type==="brass"){grid((x,y)=>atom(x,y,12,Math.random()<.3?COL.Zn:COL.Cu))}
+  if(type==="air"){for(let i=0;i<12;i++){const x=rnd(100,255),y=rnd(30,185),a=rnd(0,6.28),o=Math.random()<.22;const c=o?COL.O:COL.N;atom(x,y,8,c);atom(x+13*Math.cos(a),y+13*Math.sin(a),8,c)}}
+  if(type==="saltwater"){for(let i=0;i<14;i++){const x=rnd(100,255),y=rnd(32,185);atom(x,y,9,COL.O);atom(x-9,y+7,5,COL.H);atom(x+9,y+7,5,COL.H)}for(let i=0;i<5;i++){atom(rnd(100,255),rnd(30,185),7,COL.Na);atom(rnd(100,255),rnd(30,185),9,COL.Cl)}}
+  if(type==="sand"){sv("rect",{x:70,y:0,width:220,height:220,fill:COL.water||"#7fb8e6",opacity:.55},g);for(let i=0;i<40;i++){sv("polygon",{points:(()=>{const x=rnd(90,270),y=rnd(150,205);return `${x},${y} ${x+rnd(8,16)},${y+rnd(-6,4)} ${x+rnd(4,12)},${y+rnd(6,12)}`})(),fill:COL.sand,stroke:"#8a6d3b"},g)}sv("text",{x:180,y:70,"text-anchor":"middle","font-size":15,fill:"#0b3a5b","font-family":"var(--body)"},g).textContent="ماء";sv("text",{x:180,y:142,"text-anchor":"middle","font-size":15,fill:"#5b3d0b","font-family":"var(--body)"},g).textContent="رمل مترسّب"}
+  if(type==="salad"){const sh=[["leaf",COL.leaf],["tom",COL.tom],["cuc",COL.cuc]];for(let i=0;i<9;i++){const [n,c]=sh[i%3];const x=rnd(95,250),y=rnd(30,180);if(n==="leaf")sv("ellipse",{cx:x,cy:y,rx:30,ry:14,fill:c,stroke:"#2e7d32",transform:`rotate(${rnd(-40,40)} ${x} ${y})`},g);else if(n==="tom")sv("circle",{cx:x,cy:y,r:18,fill:c,stroke:"#8b1e1e"},g);else{sv("circle",{cx:x,cy:y,r:17,fill:c,stroke:"#33691e"},g);sv("circle",{cx:x,cy:y,r:9,fill:"#e6f4c9"},g)}}}
+  if(type==="juice"){sv("rect",{x:70,y:0,width:220,height:220,fill:COL.juice},g);for(let i=0;i<14;i++){const x=rnd(95,265),y=rnd(25,195);sv("ellipse",{cx:x,cy:y,rx:rnd(8,14),ry:rnd(3,5),fill:COL.pulp,transform:`rotate(${rnd(0,180)} ${x} ${y})`},g)}}
+  sv("rect",{x:285,y:150,width:16,height:58,rx:6,fill:"var(--ink)",transform:"rotate(-40 293 179)"},s);
+  return s;
+}
+const CAP={H2:"⚪ ذرة هيدروجين — كل جزيء ذرتان متماثلتان",Au:"🟡 ذرة ذهب",H2O:"🔴 أكسجين  ⚪ هيدروجين — جزيء ماء",NaCl:"🟣 صوديوم  🟢 كلور",brass:"🟠 نحاس  ⚪ زنك",air:"🔵 نيتروجين  🔴 أكسجين",saltwater:"جزيئات ماء، ومعها 🟣 صوديوم  🟢 كلور",sand:"حبيبات رمل في الماء",salad:"قطع خضار",juice:"قطع لب في العصير"};
+const ITEMS=[
+ {t:"غاز الهيدروجين",bin:"pure",m:"H2",why:"صحيح. كل جسيماته متماثلة (ذرات هيدروجين فقط)، فهو مادة نقية من نوع عنصر.",hintWrong:"انظري في العدسة: هل الجسيمات كلها من النوع نفسه؟"},
+ {t:"الذهب",bin:"pure",m:"Au",why:"صحيح. ذرات ذهب فقط، فهو عنصر ومادة نقية.",hintWrong:"كل الذرات في العدسة متماثلة."},
+ {t:"الماء المقطّر",bin:"pure",m:"H2O",why:"صحيح. جزيئات ماء فقط بتركيب ثابت، فهو مركّب ومادة نقية.",hintWrong:"كل جزيء في العدسة هو الجزيء نفسه."},
+ {t:"ملح الطعام",bin:"pure",m:"NaCl",why:"صحيح. صوديوم وكلور مرتبطان بنسبة ثابتة، فهو مركّب ومادة نقية.",hintWrong:"لاحظي الترتيب المنتظم الثابت للجسيمات."},
+ {t:"السلطة",bin:"het",m:"salad",why:"صحيح. ترين مكوناتها بوضوح ويمكن فصلها باليد: مخلوط غير متجانس.",hintWrong:"هل ترين المكونات منفصلة بعضها عن بعض؟"},
+ {t:"الرمل والماء",bin:"het",m:"sand",why:"صحيح. الرمل يترسب في القاع وتبقى المكونات ظاهرة: مخلوط غير متجانس.",hintWrong:"لاحظي أن الرمل لم يتوزع في الماء بل ترسّب."},
+ {t:"عصير برتقال باللب",bin:"het",m:"juice",why:"صحيح. قطع اللب ظاهرة وغير موزعة بانتظام: مخلوط غير متجانس.",hintWrong:"هل ترين قطع اللب؟"},
+ {t:"الماء المالح",bin:"hom",m:"saltwater",why:"صحيح. أيونات الملح موزعة بانتظام بين جزيئات الماء ولا ترينها: مخلوط متجانس (محلول).",hintWrong:"الملح موزع بانتظام ولا يُرى، والجسيمات من أكثر من نوع."},
+ {t:"الهواء",bin:"hom",m:"air",why:"صحيح. نيتروجين وأكسجين وغازات أخرى موزعة بانتظام: مخلوط متجانس (محلول غازي).",hintWrong:"في العدسة نوعان من الجزيئات موزعان بانتظام."},
+ {t:"النحاس الأصفر",bin:"hom",m:"brass",why:"صحيح. ذرات زنك موزعة بانتظام بين ذرات النحاس: مخلوط متجانس (محلول صلب).",hintWrong:"لاحظي نوعين من الذرات موزعين بانتظام."},
+];
+const BINS=[
+ {id:"pure",label:"مادة نقية",hint:"جسيمات من نوع واحد (عنصر أو مركّب)"},
+ {id:"het",label:"مخلوط غير متجانس",hint:"مكوناته ظاهرة وغير موزعة بانتظام"},
+ {id:"hom",label:"مخلوط متجانس (محلول)",hint:"مكوناته موزعة بانتظام ولا تُرى"},
+];
+
+function stage1(){
+  setSteps(0,TOTAL);
+  const c=el(`<section class="card"><h2>١. انظري بالعدسة ثم صنّفي</h2><p>اختاري أي مادة لتظهر جسيماتها داخل العدسة، ثم ضعيها في المجموعة المناسبة.</p><div class="stage" id="lens"></div></section>`);
+  main.append(c);
+  const lens=$("#lens",c);
+  lens.append(el(`<p class="muted" style="padding:40px 16px;text-align:center">اختاري مادة من البطاقات لتظهر جسيماتها هنا</p>`));
+  classify(c,{items:ITEMS,bins:BINS,onPick:(it)=>{lens.replaceChildren(magnifier(it.m),el(`<p class="muted" style="margin:0;padding:0 14px 10px;text-align:center">${CAP[it.m]}</p>`))}}).then(()=>{
+    c.append(el(`<div class="fb info"><b>لاحظي:</b> المادة النقية جسيماتها من نوع واحد، أما المخلوط ففيه أكثر من نوع. وإذا توزعت المكونات بانتظام ولم تُرَ فهو مخلوط متجانس، أي محلول.</div>`));
+    const b=el(`<button class="btn" type="button">التالي</button>`);c.append(b);b.onclick=()=>{b.remove();stage2()};
+  });
+}
+
+function stage2(){
+  setSteps(1,TOTAL);
+  const c=el(`<section class="card"><h2>٢. المحاليل ليست سائلة دائماً</h2><p>المحلول قد يكون صلباً أو سائلاً أو غازياً. صنّفي كل محلول حسب حالة <b>المذاب</b> وحالة <b>المذيب</b>.</p></section>`);
+  main.append(c);c.scrollIntoView({behavior:"smooth",block:"start"});
+  classify(c,{items:[
+    {t:"النحاس الأصفر (زنك في نحاس)",bin:"ss",why:"صحيح. الزنك الصلب مذاب في النحاس الصلب: محلول صلب في صلب."},
+    {t:"الفولاذ (كربون في حديد)",bin:"ss",why:"صحيح. محلول صلب في صلب."},
+    {t:"الماء المالح",bin:"sl",why:"صحيح. ملح صلب مذاب في ماء سائل."},
+    {t:"المشروبات الغازية",bin:"gl",why:"صحيح. غاز ثاني أكسيد الكربون مذاب في سائل."},
+    {t:"الهواء",bin:"gg",why:"صحيح. الأكسجين وغازات أخرى مذابة في النيتروجين: محلول غاز في غاز."},
+    {t:"الخل (حمض في ماء)",bin:"ll",why:"صحيح. سائل مذاب في سائل."},
+  ],bins:[
+    {id:"ss",label:"صلب في صلب"},{id:"sl",label:"صلب في سائل"},{id:"ll",label:"سائل في سائل"},{id:"gl",label:"غاز في سائل"},{id:"gg",label:"غاز في غاز"}
+  ]}).then(()=>{const b=el(`<button class="btn" type="button">التالي</button>`);c.append(b);b.onclick=()=>{b.remove();stage3()}});
+}
+
+async function stage3(){
+  setSteps(2,TOTAL);
+  const c=el(`<section class="card"><h2>٣. تحدَّي نفسك</h2></section>`);
+  main.append(c);c.scrollIntoView({behavior:"smooth",block:"start"});
+  await mcq(c,{q:"أيّ مما يأتي مخلوط يمكنك أن تري مكوناته؟",opts:[
+    {t:"الرمل والماء",ok:true},
+    {t:"الماء المالح",why:"الملح موزع بانتظام ولا يُرى، فهو مخلوط متجانس."},
+    {t:"الهواء",why:"الهواء مخلوط متجانس لا تُرى مكوناته."},
+    {t:"الذهب",why:"الذهب مادة نقية وليس مخلوطاً."}],right:"صحيح. الرمل يترسب فتظهر المكونات: مخلوط غير متجانس."});
+  await mcq(c,{q:"لماذا يُعد الماء المقطّر مادة نقية؟",opts:[
+    {t:"لأن جميع جسيماته متماثلة وتركيبه ثابت",ok:true},
+    {t:"لأنه شفاف لا لون له",why:"الماء المالح شفاف أيضاً لكنه مخلوط. الشفافية ليست هي المعيار."},
+    {t:"لأنه سائل",why:"الحالة لا تحدد إن كانت المادة نقية أم مخلوطاً."},
+    {t:"لأنه يذيب الملح",why:"هذه خاصية الماء كمذيب، وليست سبب كونه مادة نقية."}],right:"صحيح. المادة النقية جسيماتها متماثلة وتركيبها ثابت."});
+  await mcq(c,{q:"يُعد النحاس الأصفر:",opts:[
+    {t:"محلولاً صلباً",ok:true},
+    {t:"عنصراً نقياً",why:"فيه نوعان من الذرات (نحاس وزنك)."},
+    {t:"مخلوطاً غير متجانس",why:"الزنك موزع فيه بانتظام."},
+    {t:"مركّباً",why:"الزنك والنحاس لم يرتبطا كيميائياً بنسبة ثابتة، بل اختلطا."}],right:"صحيح. زنك مذاب في نحاس: محلول صلب في صلب."});
+  setSteps(3,TOTAL);
+  const b=el(`<button class="btn alt" type="button">احصلي على رمز الإنجاز</button>`);c.append(b);
+  b.onclick=()=>{setSteps(TOTAL,TOTAL);const t=el(`<section class="card"></section>`);main.append(t);finish(t,CODE,[
+    "المادة النقية جسيماتها من نوع واحد: عنصر (مثل الهيدروجين والذهب) أو مركّب (مثل الماء والملح).",
+    "المخلوط غير المتجانس تُرى مكوناته، مثل السلطة والرمل في الماء.",
+    "المخلوط المتجانس (المحلول) مكوناته موزعة بانتظام ولا تُرى، مثل الماء المالح والهواء.",
+    "المحاليل قد تكون صلبة مثل النحاس الأصفر، أو سائلة، أو غازية مثل الهواء."]);b.remove()};
+}
+
+main.append(el(`<section class="card"><p>في هذا المعمل تكتشفين الفرق بين <b>المادة النقية</b> و<b>المخلوط</b> بالنظر إلى الجسيمات نفسها، ثم تتعرفين حالات المحاليل.</p></section>`));
+stage1();
+
+</script>
