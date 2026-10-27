@@ -1,0 +1,457 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>[hidden]{display:none!important}</style>
+<title>معمل الشغل والآلات</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#f3f1ec; --surface:#ffffff; --ink:#1f2328; --muted:#5d6570; --line:#d9d4c9;
+  --stage:#e8eef2; --accent:#0f6e8c; --accent-soft:#dcedf3; --warm:#c2410c; --warm-soft:#fde9dc;
+  --ok:#1f7a4d; --ok-soft:#dff1e7; --bad:#b42318; --bad-soft:#fbe4e1;
+  --acid:#d1344a; --base:#2b5fd9; --neutral:#2f9e5a; --water:#7fb8e6; --glass:#c9d6de;
+  --display:"Readex Pro","IBM Plex Sans Arabic",Tahoma,sans-serif;
+  --body:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#14171b; --surface:#1c2026; --ink:#eceff3; --muted:#a3abb6; --line:#2e343c;
+  --stage:#1a242c; --accent:#5cc0e0; --accent-soft:#16323d; --warm:#ff8a4c; --warm-soft:#3b2116;
+  --ok:#5fd39a; --ok-soft:#173326; --bad:#ff8a7a; --bad-soft:#3a1d1a;
+  --acid:#ff6b7f; --base:#7aa2ff; --neutral:#5fd39a; --water:#3d6f99; --glass:#4a5863; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14171b; --surface:#1c2026; --ink:#eceff3; --muted:#a3abb6; --line:#2e343c;
+  --stage:#1a242c; --accent:#5cc0e0; --accent-soft:#16323d; --warm:#ff8a4c; --warm-soft:#3b2116;
+  --ok:#5fd39a; --ok-soft:#173326; --bad:#ff8a7a; --bad-soft:#3a1d1a;
+  --acid:#ff6b7f; --base:#7aa2ff; --neutral:#5fd39a; --water:#3d6f99; --glass:#4a5863; color-scheme:dark}
+html{direction:rtl}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.7}
+.wrap{max-width:860px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+.wrap>header{display:flex;flex-direction:column;gap:4px;padding-inline-end:110px}
+.eyebrow{font-size:13px;color:var(--muted)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(24px,5vw,32px);line-height:1.3;margin:0;text-wrap:balance}
+.steps{display:flex;gap:6px;list-style:none;margin:6px 0 0;padding:0}
+.steps li{flex:1;height:6px;border-radius:3px;background:var(--line)}
+.steps li.done{background:var(--accent)}
+.steps li.now{background:var(--warm)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.card h2{font-family:var(--display);font-weight:500;font-size:20px;margin:0}
+.card h3{font-family:var(--display);font-weight:500;font-size:17px;margin:0}
+.card p{margin:0;max-width:68ch}
+.muted{color:var(--muted);font-size:14px}
+.stage{background:var(--stage);border-radius:10px;overflow:hidden;position:relative}
+.stage svg{display:block;width:100%;height:auto}
+.opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:right;background:var(--bg);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.opt[disabled]{cursor:default}
+button:focus-visible,.chip:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn{font:inherit;font-weight:600;background:var(--warm);color:#fff;border:0;border-radius:10px;padding:12px 18px;cursor:pointer;align-self:flex-start}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.alt{background:var(--accent)}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.fb{border-radius:10px;padding:10px 14px;font-size:15px}
+.fb.ok{background:var(--ok-soft);color:var(--ok)}
+.fb.no{background:var(--bad-soft);color:var(--bad)}
+.fb.info{background:var(--accent-soft);color:var(--ink)}
+.done-card{border:2px solid var(--ok)}
+.code{font-family:var(--display);font-weight:700;font-size:44px;letter-spacing:.15em;direction:ltr;text-align:center;background:var(--ok-soft);color:var(--ok);border-radius:12px;padding:10px;font-variant-numeric:tabular-nums}
+ul.learned{margin:0;padding-inline-start:20px;display:grid;gap:4px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:15px;background:var(--surface);color:var(--ink);border:1.5px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--warm);background:var(--warm-soft)}
+.chip.placed{opacity:.35;cursor:default}
+.bins{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.bin{font:inherit;text-align:right;background:var(--bg);color:var(--ink);border:2px dashed var(--line);border-radius:12px;padding:10px 12px;min-height:96px;display:flex;flex-direction:column;gap:6px;cursor:pointer}
+.bin b{font-family:var(--display);font-weight:500;font-size:15px}
+.bin .in{display:flex;flex-wrap:wrap;gap:4px}
+.bin .in span{font-size:13px;background:var(--ok-soft);color:var(--ok);border-radius:999px;padding:2px 10px}
+.bin.ready{border-color:var(--warm)}
+.tablebox{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:460px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right}
+th{font-weight:600;color:var(--muted);font-size:13px}
+td.empty{color:var(--muted)}
+.slider{display:flex;flex-direction:column;gap:4px}
+.slider label{font-size:14px;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.slider output{font-variant-numeric:tabular-nums;color:var(--ink);font-weight:600}
+input[type=range]{width:100%;accent-color:var(--warm)}
+.seg{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:6px}
+.seg button{font:inherit;font-size:15px;background:var(--bg);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:8px 6px;cursor:pointer;line-height:1.35}
+.seg button small{display:block;color:var(--muted);font-size:12px}
+.seg button[aria-pressed="true"]{border-color:var(--warm);background:var(--warm-soft)}
+.seg button.tried{border-style:solid}
+.seg button.tried::after{content:" ✓";color:var(--ok);font-size:12px}
+.order{display:grid;gap:6px;counter-reset:n;padding:0;margin:0;list-style:none}
+.order li{background:var(--ok-soft);color:var(--ok);border-radius:10px;padding:8px 12px;counter-increment:n}
+.order li::before{content:counter(n) ". ";font-weight:700}
+.order li.slot{background:var(--bg);color:var(--muted);border:1.5px dashed var(--line)}
+.order li.slot::before{color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
+
+table{min-width:0}
+</style>
+<div class="wrap">
+<header><span class="eyebrow">معمل افتراضي · أول متوسط · الشغل والآلات البسيطة</span><h1>الشغل والآلات البسيطة</h1><ul class="steps" id="steps" aria-hidden="true"></ul></header>
+<main id="main" style="display:flex;flex-direction:column;gap:16px"></main>
+</div>
+<style>
+.fxglow{position:fixed;inset:0;pointer-events:none;z-index:30;opacity:0}
+.fxglow.ok{box-shadow:inset 0 0 0 6px #2fbf71,inset 0 0 90px 30px rgba(47,191,113,.55);animation:fxg 1s ease-out}
+.fxglow.no{box-shadow:inset 0 0 0 6px #e5484d,inset 0 0 90px 30px rgba(229,72,77,.45);animation:fxg .8s ease-out}
+@keyframes fxg{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
+.fxbadge{position:fixed;left:50%;top:40%;z-index:31;pointer-events:none;font-family:var(--display);font-weight:700;font-size:42px;color:#fff;background:#1f9d5c;padding:8px 30px;border-radius:999px;opacity:0;transform:translate(-50%,-50%) scale(.6)}
+.fxbadge.show{animation:fxb 1.1s ease-out}
+@keyframes fxb{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}35%{transform:translate(-50%,-50%) scale(1)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
+@media (prefers-reduced-motion:reduce){.fxbadge.show{animation:none;opacity:0}.fxglow.ok,.fxglow.no{animation-duration:.01s}}
+.wrap>header{padding-inline-end:110px}
+.sndbtn{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:calc(10px + env(safe-area-inset-left,0px));z-index:20;font:inherit;font-size:14px;background:var(--surface);color:var(--ink);border:1.5px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer}
+.sndbtn:focus-visible{outline:3px solid var(--plate);outline-offset:2px}
+</style>
+<button class="sndbtn" id="sndbtn" aria-pressed="true">الصوت: يعمل</button>
+<script>
+const SFX=(()=>{
+  let ac=null,on=true;
+  const btn=document.getElementById("sndbtn");
+  btn.onclick=()=>{on=!on;btn.setAttribute("aria-pressed",on);btn.textContent=on?"الصوت: يعمل":"الصوت: متوقف";};
+  const A=()=>{if(!on)return null;try{if(!ac)ac=new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();return ac}catch(e){return null}};
+  function tone(f,t0,d,type,vol,f2){const c=A();if(!c)return;const o=c.createOscillator(),g=c.createGain();o.type=type||"sine";o.frequency.setValueAtTime(f,c.currentTime+t0);if(f2)o.frequency.exponentialRampToValueAtTime(f2,c.currentTime+t0+d);g.gain.setValueAtTime(0,c.currentTime+t0);g.gain.linearRampToValueAtTime(vol||.2,c.currentTime+t0+.02);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t0+d);o.connect(g).connect(c.destination);o.start(c.currentTime+t0);o.stop(c.currentTime+t0+d+.05)}
+  function noise(t0,d,vol,fType,fFreq,fEnd){const c=A();if(!c)return;const n=c.sampleRate*d,b=c.createBuffer(1,n,c.sampleRate),x=b.getChannelData(0);for(let i=0;i<n;i++)x[i]=Math.random()*2-1;const s=c.createBufferSource();s.buffer=b;const f=c.createBiquadFilter();f.type=fType||"lowpass";f.frequency.setValueAtTime(fFreq||800,c.currentTime+t0);if(fEnd)f.frequency.exponentialRampToValueAtTime(fEnd,c.currentTime+t0+d);const g=c.createGain();g.gain.setValueAtTime(vol||.3,c.currentTime+t0);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t0+d);s.connect(f).connect(g).connect(c.destination);s.start(c.currentTime+t0)}
+  const fx=document.createElement("div");fx.className="fxglow";fx.setAttribute("aria-hidden","true");document.body.append(fx);
+  const badge=document.createElement("div");badge.className="fxbadge";badge.setAttribute("aria-hidden","true");badge.textContent="ممتاز";document.body.append(badge);
+  function glow(kind){fx.className="fxglow";badge.className="fxbadge";void fx.offsetWidth;fx.className="fxglow "+kind;if(kind==="ok"){void badge.offsetWidth;badge.className="fxbadge show"}}
+  const ding=()=>{tone(1318,0,.7,"sine",.22);tone(2637,0,.35,"sine",.06)};
+  const buzz=()=>{tone(150,0,.28,"square",.07,120)};
+  return{
+    good(){glow("ok");ding()},
+    bad(){glow("no");buzz()},
+    win(){glow("ok");ding();setTimeout(()=>tone(1568,0,.8,"sine",.2),220)},
+    tick(){tone(880,0,.08,"sine",.1)},
+    rumble(d,vol){noise(0,d||2,vol||.5,"lowpass",140,60)},
+    boom(){noise(0,2.5,1,"lowpass",900,40);tone(70,0,1.4,"sine",.6,30)},
+    bubble(){for(let i=0;i<10;i++)tone(300+Math.random()*500,i*.12+Math.random()*.05,.08,"sine",.07,700+Math.random()*400)},
+    hiss(d){noise(0,d||1.5,.15,"highpass",3000)},
+    whoosh(){noise(0,.6,.25,"bandpass",400,2400)},
+    thud(){tone(110,0,.25,"sine",.35,50)},
+  };
+})();
+</script>
+<script>
+// Shared helpers for all labs
+const $=(s,r=document)=>r.querySelector(s);
+const el=(html)=>{const t=document.createElement("template");t.innerHTML=html.trim();return t.content.childElementCount===1?t.content.firstElementChild:t.content};
+const shuffle=(a)=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
+const SVGNS="http://www.w3.org/2000/svg";
+function sv(tag,attrs,parent){const e=document.createElementNS(SVGNS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.append(e);return e}
+
+// Step bar
+function setSteps(n,total){const ul=$("#steps");ul.replaceChildren();for(let i=0;i<total;i++){const li=document.createElement("li");if(i<n)li.className="done";else if(i===n)li.className="now";ul.append(li)}}
+
+// Multiple-choice: must reach the right answer to continue. Returns promise resolved on correct.
+// opts: [{t:"text", ok:true/false, why:"explanation"}]
+function mcq(host,{q,opts,right,doShuffle=true}){
+  return new Promise(res=>{
+    const box=el(`<div class="opts" role="group"></div>`);
+    const fb=el(`<div class="fb" role="status" hidden></div>`);
+    if(q)host.append(el(`<p><b>${q}</b></p>`));
+    host.append(box,fb);
+    const list=doShuffle?shuffle(opts):opts;
+    let tries=0;
+    list.forEach(o=>{
+      const b=el(`<button class="opt" type="button">${o.t}</button>`);
+      b.onclick=()=>{
+        if(o.ok){
+          box.querySelectorAll(".opt").forEach(x=>x.disabled=true);
+          b.classList.add("right");fb.hidden=false;fb.className="fb ok";fb.textContent=right||o.why||"إجابة صحيحة.";SFX.good();res(tries)
+        }else{
+          tries++;b.classList.add("wrong");b.disabled=true;fb.hidden=false;fb.className="fb no";fb.textContent=o.why||"ليست هذه. فكّري مرة أخرى.";SFX.bad()
+        }
+      };
+      box.append(b);
+    });
+  });
+}
+
+// Tap-to-classify: pick a chip then a bin. items:[{t, bin, why}] bins:[{id,label,hint}]
+function classify(host,{items,bins,onPick}){
+  return new Promise(res=>{
+    const chips=el(`<div class="chips" aria-label="البطاقات"></div>`);
+    const binsEl=el(`<div class="bins"></div>`);
+    const fb=el(`<div class="fb info" role="status">اختاري بطاقة، ثم اختاري المجموعة المناسبة لها.</div>`);
+    host.append(chips,binsEl,fb);
+    let sel=null,left=items.length;
+    const binBtns={};
+    bins.forEach(b=>{
+      const bb=el(`<button class="bin" type="button"><b>${b.label}</b>${b.hint?`<span class="muted">${b.hint}</span>`:""}<span class="in"></span></button>`);
+      bb.onclick=()=>{
+        if(!sel){fb.className="fb info";fb.textContent="اختاري بطاقة أولاً.";return}
+        const it=sel.item;
+        if(it.bin===b.id){
+          bb.querySelector(".in").append(el(`<span>${it.t}</span>`));
+          sel.btn.classList.add("placed");sel.btn.disabled=true;sel.btn.setAttribute("aria-pressed","false");
+          fb.className="fb ok";fb.textContent=it.why||"صحيح.";SFX.good();sel=null;left--;
+          Object.values(binBtns).forEach(x=>x.classList.remove("ready"));
+          if(left===0)res();
+        }else{
+          fb.className="fb no";fb.textContent=it.hintWrong||"ليست هذه المجموعة. انظري إلى المادة مرة أخرى.";SFX.bad();
+        }
+      };
+      binBtns[b.id]=bb;binsEl.append(bb);
+    });
+    shuffle(items).forEach(it=>{
+      const c=el(`<button class="chip" type="button" aria-pressed="false">${it.t}</button>`);
+      c.onclick=()=>{
+        chips.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed","false"));
+        c.setAttribute("aria-pressed","true");sel={item:it,btn:c};SFX.tick();
+        Object.values(binBtns).forEach(x=>x.classList.add("ready"));
+        fb.className="fb info";fb.textContent="«"+it.t+"»: إلى أي مجموعة تنتمي؟";
+        if(onPick)onPick(it);
+      };
+      chips.append(c);
+    });
+  });
+}
+
+// Final screen with code
+function finish(task,code,learned){
+  SFX.win();
+  task.classList.add("done-card");
+  task.replaceChildren(el(`<div><h2>أنهيتِ المعمل</h2><p>رمز الإنجاز الخاص بهذا المعمل:</p><div class="code">${code}</div><p>عودي إلى النموذج واكتبي هذا الرمز، ثم أجيبي عن السؤال.</p><h2 style="margin-top:12px">ما تعلمتِه</h2><ul class="learned">${learned.map(x=>`<li>${x}</li>`).join("")}</ul></div>`));
+  task.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+</script>
+<script>
+const CODE="7314";
+const main=$("#main");
+const TOTAL=6;
+
+// ============ Stage 1: work ============
+function stage1(){
+  setSteps(0,TOTAL);
+  const card=el(`<section class="card"><h2>١. احسبي الشغل</h2>
+  <p>الشغل = القوة × المسافة (ش = ق × ف)، ووحدته <b>الجول</b>. اختاري الصندوق والارتفاع، ثم ارفعيه.</p>
+  <div class="stage" id="lift"></div>
+  <div class="lbl muted">الصندوق</div><div class="seg" id="boxes"></div>
+  <div class="slider"><label>ارتفاع الرفع <output id="oh">1 م</output></label><input type="range" id="h" min="1" max="3" step="1" value="1" aria-label="ارتفاع الرفع"></div>
+  <button class="btn alt" type="button" id="up">ارفعي الصندوق</button>
+  <div class="fb info" id="wout">اختاري صندوقاً.</div>
+  <div class="tablebox"><table><thead><tr><th>القوة</th><th>المسافة</th><th>الشغل</th></tr></thead><tbody id="wtb"></tbody></table></div>
+  <div id="s1q"></div></section>`);
+  main.append(card);
+  const B=[{n:"صغير",f:100},{n:"متوسط",f:200},{n:"كبير",f:500}];
+  const s=sv("svg",{viewBox:"0 0 400 190",role:"img","aria-label":"رفع صندوق إلى أعلى"},$("#lift",card));
+  sv("rect",{x:0,y:170,width:400,height:20,fill:"#a8a29e"},s);
+  for(let m=0;m<=3;m++){const y=170-m*45;sv("line",{x1:60,y1:y,x2:72,y2:y,stroke:"var(--ink)"},s);const t=sv("text",{x:56,y:y+4,"text-anchor":"end",direction:"ltr","font-size":11,fill:"var(--ink)"},s);t.textContent=m+" m".replace("m","م")}
+  sv("line",{x1:66,y1:35,x2:66,y2:170,stroke:"var(--ink)"},s);
+  const bx=sv("g",{},s);const r=sv("rect",{x:170,y:130,width:60,height:40,rx:3,fill:"#b45309",stroke:"#78350f"},bx);const bt=sv("text",{x:200,y:155,"text-anchor":"middle","font-size":12,fill:"#fff","font-weight":700},bx);
+  const ar=sv("g",{},s);
+  let cur=null;const rows=new Set();
+  B.forEach((b,i)=>{const e=el(`<button type="button" aria-pressed="false">${b.n}<small>وزنه ${b.f} نيوتن</small></button>`);e.onclick=()=>{$("#boxes",card).querySelectorAll("button").forEach(z=>z.setAttribute("aria-pressed","false"));e.setAttribute("aria-pressed","true");cur=b;bt.textContent=b.f+" ن";const w=40+i*15;r.setAttribute("width",w);r.setAttribute("x",200-w/2);bx.setAttribute("transform","");ar.replaceChildren();SFX.tick();$("#wout",card).textContent="اختاري الارتفاع ثم ارفعي."};$("#boxes",card).append(e)});
+  $("#h",card).oninput=e=>{$("#oh",card).textContent=e.target.value+" م";SFX.tick()};
+  $("#up",card).onclick=async()=>{
+    if(!cur){$("#wout",card).className="fb no";$("#wout",card).textContent="اختاري صندوقاً أولاً.";return}
+    const h=+$("#h",card).value;const btn=$("#up",card);btn.disabled=true;
+    ar.replaceChildren();sv("line",{x1:250,y1:150,x2:250,y2:150-h*45,stroke:"var(--warm)","stroke-width":4},ar);sv("path",{d:`M250 ${140-h*45} L243 ${152-h*45} L257 ${152-h*45} Z`,fill:"var(--warm)"},ar);
+    for(let i=0;i<=30;i++){bx.setAttribute("transform",`translate(0,${-h*45*i/30})`);await sleep(25)}SFX.thud();
+    {const yb=170-h*45;sv("line",{x1:66,y1:yb,x2:200-(+r.getAttribute("width"))/2,y2:yb,stroke:"var(--warm)","stroke-width":2,"stroke-dasharray":"6 4"},ar);sv("circle",{cx:66,cy:yb,r:4,fill:"var(--warm)"},ar);const lt=sv("text",{x:120,y:yb-6,"text-anchor":"middle",direction:"ltr","font-size":12,"font-weight":700,fill:"var(--warm)"},ar);lt.textContent="الارتفاع "+h+" م"}
+    const W=cur.f*h;const o=$("#wout",card);o.className="fb ok";o.innerHTML=`ش = ق × ف = ${cur.f} × ${h} = <b>${W} جول</b>`;
+    const key=cur.f+"-"+h;if(!rows.has(key)){rows.add(key);$("#wtb",card).append(el(`<tr><td>${cur.f} نيوتن</td><td>${h} م</td><td>${W} جول</td></tr>`))}
+    btn.disabled=false;if(rows.size===2)ask();
+  };
+  let asked=false;
+  async function ask(){if(asked)return;asked=true;
+    const q=$("#s1q",card);q.style.cssText="display:flex;flex-direction:column;gap:10px";
+    q.append(el(`<p class="muted">جرّبي ما تشائين، ثم أجيبي:</p>`));
+    await mcq(q,{q:"رفع محمد صندوقاً بقوة 500 نيوتن مسافة 2 م إلى أعلى. ما الشغل المبذول؟",opts:[
+      {t:"ش = ق × ف = 500 × 2 = 1000 جول",ok:true},
+      {t:"500 ÷ 2 = 250 جول",why:"الشغل حاصل ضرب القوة في المسافة، وليس القسمة."},
+      {t:"500 × 2 = 1000 نيوتن",why:"الحساب صحيح، لكن وحدة الشغل الجول. النيوتن وحدة القوة."},
+      {t:"500 ÷ 2 = 250 م/ث²",why:"هذا خلط بالتسارع. الشغل = القوة × المسافة، ووحدته الجول."}],right:"صحيح. تذكّري: الشغل بالجول، والقوة بالنيوتن."});
+    await mcq(q,{q:"دفعت سارة جداراً بكل قوتها مدة دقيقة، ولم يتحرك الجدار. كم الشغل الذي بذلته على الجدار؟",opts:[
+      {t:"صفر؛ لأن الجدار لم يتحرك أي مسافة",ok:true},{t:"شغل كبير؛ لأنها تعبت",why:"التعب ليس شغلاً بالمعنى العلمي. الشغل يحتاج إلى حركة في اتجاه القوة."},{t:"يعتمد على الزمن",why:"قانون الشغل لا يحتوي على الزمن: ش = ق × ف."}],right:"صحيح. إذا كانت المسافة صفراً فالشغل صفر."});
+    const n=el(`<button class="btn" type="button">التالي</button>`);q.append(n);n.onclick=()=>{n.remove();stageTypes()};
+  }
+  window.__s1=()=>({boxes:[...$("#boxes",card).querySelectorAll("button")],h:$("#h",card),up:$("#up",card)});
+}
+
+// ============ Types of simple machines ============
+const ICON={
+ lever:`<svg viewBox="0 0 80 44" width="80" height="44" aria-hidden="true"><rect x="4" y="16" width="72" height="5" rx="2" fill="#b45309" transform="rotate(-8 40 18)"/><path d="M40 22 L32 40 L48 40 Z" fill="#475569"/><rect x="6" y="2" width="14" height="14" fill="#0f6e8c"/></svg>`,
+ pulley:`<svg viewBox="0 0 80 44" width="80" height="44" aria-hidden="true"><line x1="40" y1="0" x2="40" y2="6" stroke="#475569" stroke-width="3"/><circle cx="40" cy="16" r="10" fill="none" stroke="#475569" stroke-width="4"/><line x1="30" y1="16" x2="30" y2="42" stroke="#b45309" stroke-width="2"/><line x1="50" y1="16" x2="50" y2="34" stroke="#b45309" stroke-width="2"/><rect x="44" y="32" width="12" height="10" fill="#0f6e8c"/></svg>`,
+ wheel:`<svg viewBox="0 0 80 44" width="80" height="44" aria-hidden="true"><circle cx="40" cy="22" r="19" fill="none" stroke="#475569" stroke-width="4"/><circle cx="40" cy="22" r="6" fill="#b45309"/><line x1="40" y1="22" x2="40" y2="4" stroke="#475569" stroke-width="2"/><line x1="40" y1="22" x2="56" y2="31" stroke="#475569" stroke-width="2"/><line x1="40" y1="22" x2="24" y2="31" stroke="#475569" stroke-width="2"/></svg>`,
+ ramp:`<svg viewBox="0 0 80 44" width="80" height="44" aria-hidden="true"><path d="M4 40 L74 40 L74 8 Z" fill="#c08a55"/><rect x="36" y="16" width="12" height="12" fill="#0f6e8c" transform="rotate(-24 42 22)"/></svg>`,
+ wedge:`<svg viewBox="0 0 80 44" width="80" height="44" aria-hidden="true"><path d="M28 2 L52 2 L40 42 Z" fill="#94a3b8" stroke="#475569" stroke-width="2"/></svg>`,
+ screw:`<svg viewBox="0 0 80 44" width="80" height="44" aria-hidden="true"><rect x="30" y="2" width="20" height="6" rx="2" fill="#475569"/><rect x="35" y="8" width="10" height="30" fill="#94a3b8"/><path d="M33 12 L47 16 M33 18 L47 22 M33 24 L47 28 M33 30 L47 34" stroke="#475569" stroke-width="2"/><path d="M35 38 L40 44 L45 38 Z" fill="#94a3b8"/></svg>`};
+async function stageTypes(){
+  setSteps(1,TOTAL);
+  const card=el(`<section class="card"><h2>٢. تعرّفي الآلات البسيطة الست</h2>
+  <p>الآلة البسيطة أداة تسهّل العمل بحركة واحدة. هذه أنواعها الستة:</p>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px" id="gal"></div>
+  <p><b>ضعي كل أداة من حياتك تحت نوع الآلة البسيطة التي تمثّلها:</b></p></section>`);
+  main.append(card);card.scrollIntoView({behavior:"smooth",block:"start"});
+  const T=[["lever","الرافعة","ساق تدور حول نقطة ارتكاز"],["pulley","البكرة","عجلة يلتف حولها حبل"],["wheel","العجلة والمحور","عجلة كبيرة مثبّتة على محور صغير"],["ramp","المستوى المائل","سطح منحدر"],["wedge","الإسفين","مستوى مائل متحرك يشقّ الأشياء"],["screw","البرغي","مستوى مائل ملفوف حول أسطوانة"]];
+  T.forEach(([k,n,d])=>$("#gal",card).append(el(`<div style="background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px;text-align:center">${ICON[k]}<div><b>${n}</b></div><div class="muted" style="font-size:12px;line-height:1.4">${d}</div></div>`)));
+  await classify(card,{items:[
+    {t:"الأرجوحة (السيسو)",bin:"lever",why:"صحيح. ساق تدور حول نقطة ارتكاز في الوسط: رافعة."},
+    {t:"فتّاحة الزجاجات",bin:"lever",why:"صحيح. رافعة."},
+    {t:"سارية العَلَم",bin:"pulley",why:"صحيح. بكرة في أعلاها: نسحب الحبل للأسفل فيرتفع العلم."},
+    {t:"مقبض الباب",bin:"wheel",why:"صحيح. المقبض الكبير عجلة، والقضيب الذي يدور محور."},
+    {t:"مِقوَد السيارة",bin:"wheel",why:"صحيح. المقود عجلة كبيرة مثبّتة على محور يدير السيارة."},
+    {t:"الزحليقة",bin:"ramp",why:"صحيح. الزحليقة سطح منحدر: مستوى مائل."},
+    {t:"الفأس",bin:"wedge",why:"صحيح. رأس الفأس إسفين يشقّ الخشب."},
+    {t:"السكين",bin:"wedge",why:"صحيح. حدّ السكين إسفين."},
+    {t:"غطاء القارورة اللولبي",bin:"screw",why:"صحيح. الحزوز الملفوفة في الغطاء برغي."}],
+    bins:T.map(([k,n])=>({id:k,label:n}))});
+  const q=el(`<div style="display:flex;flex-direction:column;gap:10px"></div>`);card.append(q);
+  q.append(el(`<h3>ما فائدة الآلة البسيطة؟</h3><p>الآلة البسيطة <b>لا تقلّل الشغل</b>، لكنها تسهّله بواحدة من ثلاث طرق: <b>تقليل القوة</b>، أو <b>تغيير اتجاه القوة</b>، أو <b>تغيير المسافة</b>.</p>`));
+  await mcq(q,{q:"في سارية العلم نسحب الحبل إلى الأسفل فيرتفع العلم إلى الأعلى. ما فائدة البكرة هنا؟",opts:[{t:"تغيير اتجاه القوة",ok:true},{t:"تقليل الشغل",why:"الآلات البسيطة لا تقلّل الشغل. انظري إلى اتجاه السحب واتجاه حركة العلم."},{t:"زيادة وزن العلم",why:"البكرة لا تغيّر الوزن. لاحظي: نسحب للأسفل والعلم يرتفع."}],right:"صحيح. البكرة الثابتة تغيّر اتجاه القوة، فنسحب للأسفل بدل أن نصعد للأعلى."});
+  await mcq(q,{q:"لماذا يسهل فتح الباب من مقبضه، ويصعب تدوير القضيب الرفيع وحده؟",opts:[{t:"لأن العجلة الكبيرة (المقبض) تقلّل القوة اللازمة لتدوير المحور",ok:true},{t:"لأن المقبض يقلّل الشغل",why:"الشغل لا يقلّ. لكن القوة اللازمة تقلّ لأن اليد تدور مسافة أطول."},{t:"لأن القضيب أثقل من المقبض",why:"الوزن ليس السبب. فكّري في حجم العجلة مقارنة بالمحور."}],right:"صحيح. العجلة والمحور تقلّل القوة، مقابل مسافة أطول تدورها اليد."});
+  const n=el(`<button class="btn" type="button">التالي</button>`);q.append(n);n.onclick=()=>{n.remove();stageLever()};
+}
+
+// ============ Lever experiment ============
+function stageLever(){
+  setSteps(2,TOTAL);
+  const card=el(`<section class="card"><h2>٣. جرّبي الرافعة</h2>
+  <p>تريدين رفع صخرة وزنها 300 نيوتن بعصا طويلة. حرّكي <b>نقطة الارتكاز</b> حتى تستطيعي رفعها بقوة <b>100 نيوتن أو أقل</b>.</p>
+  <div class="stage" id="lv"></div>
+  <div class="slider"><label>موضع نقطة الارتكاز <output id="oP"></output></label><input type="range" id="P" min="1" max="7" step="1" value="6" aria-label="موضع نقطة الارتكاز"></div>
+  <div class="fb info" id="lvo"></div>
+  <button class="btn alt" type="button" id="lift">ادفعي طرف العصا</button>
+  <div id="lvq"></div></section>`);
+  main.append(card);card.scrollIntoView({behavior:"smooth",block:"start"});
+  const s=sv("svg",{viewBox:"0 0 400 150",role:"img","aria-label":"رافعة: عصا فوق نقطة ارتكاز وصخرة على طرفها"},$("#lv",card));
+  sv("rect",{x:0,y:130,width:400,height:20,fill:"#a8a29e"},s);const g=sv("g",{},s);
+  const X0=40,X1=360;
+  function F(p){return Math.round(300*p/(8-p))}
+  function draw(tilt){
+    const p=+$("#P",card).value;const fx=X0+(X1-X0)*p/8;
+    g.replaceChildren();
+    sv("path",{d:`M${fx} 110 L${fx-14} 130 L${fx+14} 130 Z`,fill:"#475569"},g);
+    const gg=sv("g",{transform:`rotate(${tilt||0} ${fx} 108)`},g);
+    sv("rect",{x:X0,y:104,width:X1-X0,height:8,rx:3,fill:"#b45309"},gg);
+    sv("ellipse",{cx:X0+18,cy:88,rx:26,ry:18,fill:"#78716c"},gg);const t=sv("text",{x:X0+18,y:92,"text-anchor":"middle","font-size":11,fill:"#fff"},gg);t.textContent="300 ن";
+    sv("line",{x1:X1-6,y1:60,x2:X1-6,y2:98,stroke:"var(--warm)","stroke-width":5},gg);sv("path",{d:`M${X1-6} 104 L${X1-13} 92 L${X1+1} 92 Z`,fill:"var(--warm)"},gg);
+    const f=F(p);const t2=sv("text",{x:X1-6,y:52,"text-anchor":"middle","font-size":12,"font-weight":700,fill:"var(--ink)"},gg);t2.textContent=f+" ن";
+    $("#oP",card).textContent=p<=2?"قريبة من الصخرة":p>=6?"قريبة من يدك":"في الوسط";
+    $("#lvo",card).className="fb info";$("#lvo",card).innerHTML=`القوة اللازمة لرفع الصخرة: <b>${f} نيوتن</b>`;
+  }
+  $("#P",card).oninput=()=>{SFX.tick();draw()};draw();
+  $("#lift",card).onclick=async()=>{
+    const p=+$("#P",card).value,f=F(p);
+    if(f>100){SFX.bad();for(let i=0;i<4;i++){draw(i%2?1:-1);await sleep(90)}draw();$("#lvo",card).className="fb no";$("#lvo",card).innerHTML=`تحتاجين ${f} نيوتن، وهذا أكثر من 100. جرّبي تحريك نقطة الارتكاز نحو الصخرة.`;return}
+    $("#lift",card).remove();$("#P",card).disabled=true;
+    for(let i=0;i<=12;i++){draw(i);await sleep(40)}SFX.good();
+    $("#lvo",card).className="fb ok";$("#lvo",card).innerHTML=`ارتفعت الصخرة بقوة ${f} نيوتن فقط!`;
+    const q=$("#lvq",card);q.style.cssText="display:flex;flex-direction:column;gap:10px";
+    await mcq(q,{q:"كلما اقتربت نقطة الارتكاز من الحمل (الصخرة):",opts:[{t:"قلّت القوة اللازمة لرفعه",ok:true},{t:"زادت القوة اللازمة",why:"راقبي الرقم فوق السهم وأنتِ تحرّكين نقطة الارتكاز نحو الصخرة."},{t:"لا تتغير القوة",why:"جرّبتِ بنفسك: القوة تغيّرت مع موضع نقطة الارتكاز."}],right:"صحيح. لكن يدكِ تتحرك مسافة أطول، فيبقى الشغل نفسه."});
+    await mcq(q,{q:"أجزاء الرافعة هي:",opts:[{t:"ساق، ونقطة ارتكاز، وقوة، وحمل",ok:true},{t:"عجلة وحبل",why:"هذه البكرة."},{t:"سطح منحدر فقط",why:"هذا المستوى المائل."}],right:"صحيح."});
+    const n=el(`<button class="btn" type="button">التالي</button>`);q.append(n);n.onclick=()=>{n.remove();stage2()};
+  };
+  window.__lv=()=>({P:$("#P",card),lift:$("#lift",card)});
+}
+
+// ============ Stage 2: inclined plane ============
+function stage2(){
+  setSteps(3,TOTAL);
+  const card=el(`<section class="card"><h2>٤. المستوى المائل: حمّلي الصندوق في الشاحنة</h2>
+  <p>صندوق وزنه 300 نيوتن، وأرضية الشاحنة ترتفع 1 م. جرّبي الطرق الأربع، وراقبي <b>مقياس القوة</b> و<b>المسافة</b> التي يقطعها الصندوق.</p>
+  <div class="stage" id="ramp"></div>
+  <div class="seg" id="ways"></div>
+  <div class="tablebox"><table><thead><tr><th>الطريقة</th><th>القوة اللازمة</th><th>المسافة</th><th>الشغل = ق × ف</th></tr></thead><tbody id="rtb"></tbody></table></div>
+  <div id="s2q"></div></section>`);
+  main.append(card);card.scrollIntoView({behavior:"smooth",block:"start"});
+  const W=[{n:"رفع مباشر",L:1},{n:"لوح طوله 2 م",L:2},{n:"لوح طوله 3 م",L:3},{n:"لوح طوله 4 م",L:4}];
+  const s=sv("svg",{viewBox:"0 0 400 200",role:"img","aria-label":"تحميل صندوق في شاحنة بلوح مائل"},$("#ramp",card));
+  const G=170,H=70,TX=300; // ground y, 1 m height in px, truck bed start x
+  sv("rect",{x:0,y:G,width:400,height:30,fill:"#a8a29e"},s);
+  // truck
+  sv("rect",{x:TX,y:G-H,width:100,height:H-14,fill:"#2b5fd9"},s);
+  sv("rect",{x:TX,y:G-H-6,width:100,height:8,fill:"#1e3a8a"},s);
+  sv("circle",{cx:TX+25,cy:G-8,r:10,fill:"#1f2328"},s);sv("circle",{cx:TX+80,cy:G-8,r:10,fill:"#1f2328"},s);
+  const hl=sv("text",{x:TX+50,y:G-H+30,"text-anchor":"middle","font-size":12,fill:"#fff","font-weight":700},s);hl.textContent="ارتفاع 1 م";
+  // gauge
+  const gx=85,gy=75,gr=52;
+  sv("path",{d:`M${gx-gr} ${gy} A${gr} ${gr} 0 0 1 ${gx+gr} ${gy}`,fill:"var(--surface)",stroke:"var(--ink)","stroke-width":2},s);
+  [[0,"0"],[150,"150"],[300,"300"]].forEach(([v,l])=>{const a=Math.PI*(1-v/300);const t=sv("text",{x:gx+(gr+12)*Math.cos(a),y:gy-(gr+12)*Math.sin(a)+4,"text-anchor":"middle",direction:"ltr","font-size":10,fill:"var(--muted)"},s);t.textContent=l});
+  const needle=sv("line",{x1:gx,y1:gy,x2:gx-gr+6,y2:gy,stroke:"var(--warm)","stroke-width":3,"stroke-linecap":"round"},s);
+  sv("circle",{cx:gx,cy:gy,r:4,fill:"var(--ink)"},s);
+  const gt=sv("text",{x:gx,y:gy+22,"text-anchor":"middle","font-size":13,"font-weight":700,fill:"var(--ink)"},s);gt.textContent="مقياس القوة";
+  const dyn=sv("g",{},s);
+  function setNeedle(v){const a=Math.PI*(1-v/300);needle.setAttribute("x2",gx+(gr-6)*Math.cos(a));needle.setAttribute("y2",gy-(gr-6)*Math.sin(a))}
+  const done=new Set();let busy=false;
+  W.forEach((w,i)=>{const b=el(`<button type="button" aria-pressed="false">${w.n}</button>`);b.onclick=async()=>{
+    if(busy)return;busy=true;$("#ways",card).querySelectorAll("button").forEach(z=>z.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");
+    dyn.replaceChildren();setNeedle(0);gt.textContent="القوة اللازمة";
+    const F=300/w.L;
+    let x0,y0,x1=TX-14,y1=G-H-14;
+    if(w.L===1){x0=TX-14;y0=G-14}
+    else{const run=Math.sqrt(w.L*w.L-1)*H;x0=TX-run;y0=G;sv("path",{d:`M${TX-run} ${G} L${TX} ${G-H} L${TX} ${G} Z`,fill:"#c08a55"},dyn);x0=x0+6;y0=G-14;x1=TX-14;y1=G-H-14}
+    const bx=sv("rect",{x:x0-14,y:y0-14,width:28,height:28,rx:3,fill:"#b45309",stroke:"#78350f"},dyn);
+    const lab=sv("text",{x:x0,y:y0-20,"text-anchor":"middle","font-size":11,fill:"var(--ink)","font-weight":700},dyn);lab.textContent="الوزن 300 نيوتن";
+    const tape=sv("line",{x1:x0,y1:y0+16,x2:x0,y2:y0+16,stroke:"var(--accent)","stroke-width":4,"stroke-linecap":"round"},dyn);
+    SFX.whoosh();const steps=40+w.L*10;
+    for(let k=0;k<=steps;k++){const t=k/steps;const x=x0+(x1-x0)*t,y=y0+(y1-y0)*t;bx.setAttribute("x",x-14);bx.setAttribute("y",y-14);lab.setAttribute("x",x);lab.setAttribute("y",y-20);
+      tape.setAttribute("x2",x);tape.setAttribute("y2",y+16);setNeedle(Math.min(F,F*Math.min(1,k/6)));await sleep(25)}
+    SFX.thud();gt.textContent="القوة اللازمة "+Math.round(F)+" نيوتن";
+    const dl=sv("text",{x:(x0+x1)/2,y:G+20,"text-anchor":"middle","font-size":12,"font-weight":700,fill:"var(--accent)"},dyn);dl.textContent="المسافة "+w.L+" م";
+    if(!done.has(i)){done.add(i);b.classList.add("tried");
+      const rows=[...$("#rtb",card).children];const tr=el(`<tr data-i="${i}"><td>${w.n}</td><td>${Math.round(F)} نيوتن</td><td>${w.L} م</td><td>${Math.round(F)} × ${w.L} = <b>300 جول</b></td></tr>`);
+      const after=rows.find(r=>+r.dataset.i>i);after?$("#rtb",card).insertBefore(tr,after):$("#rtb",card).append(tr)}
+    busy=false;if(done.size===W.length)ask();
+  };$("#ways",card).append(b)});
+  let asked=false;
+  async function ask(){if(asked)return;asked=true;
+    const q=$("#s2q",card);q.style.cssText="display:flex;flex-direction:column;gap:10px";
+    q.append(el(`<div class="fb info">لاحظي الجدول: كلما طال اللوح <b>قلّت القوة</b> و<b>طالت المسافة</b>، أما <b>الشغل فبقي 300 جول</b> دائماً.</div>`));
+    await mcq(q,{q:"أي العبارات صحيحة عند استخدام المستوى المائل لرفع كرسي ثقيل، مقارنة برفعه رأسياً؟",opts:[
+      {t:"تحتاجين إلى قوة أقل",ok:true},{t:"تحتاجين إلى بذل شغل أقل",why:"انظري إلى عمود الشغل: بقي 300 جول في كل الطرق. المستوى المائل لا يوفّر الشغل."},
+      {t:"تحتاجين إلى قوة أكبر",why:"راقبي مقياس القوة: انخفض كلما طال اللوح."},{t:"يتحرك الكرسي مسافة أقصر",why:"المسافة على اللوح أطول من الرفع المباشر."}],right:"صحيح. المستوى المائل يقلّل القوة، لكن المسافة تطول، فيبقى الشغل نفسه."});
+    await mcq(q,{q:"«المستوى المائل سطح منحدر يمكّنك من رفع جسم ثقيل بقوة أقل من رفعه رأسياً، ولكن بالتحرك لمسافة أطول.» هذه العبارة:",opts:[{t:"صواب",ok:true},{t:"خطأ",why:"جرّبتِ ذلك بنفسك: القوة قلّت والمسافة طالت."}],right:"صحيح، العبارة صواب.",doShuffle:false});
+    const n=el(`<button class="btn" type="button">التالي</button>`);q.append(n);n.onclick=()=>{n.remove();stage3()};
+  }
+  window.__s2=()=>[...$("#ways",card).querySelectorAll("button")];
+}
+
+// ============ Stage 3: simple vs compound machines ============
+async function stage3(){
+  setSteps(4,TOTAL);
+  const card=el(`<section class="card"><h2>٥. آلة بسيطة أم مركّبة؟</h2>
+  <p>الآلة البسيطة تعمل بحركة واحدة، أما الآلة المركّبة فتتكوّن من آلتين بسيطتين أو أكثر.</p></section>`);
+  main.append(card);card.scrollIntoView({behavior:"smooth",block:"start"});
+  await classify(card,{items:[
+    {t:"المستوى المائل",bin:"s",why:"صحيح. آلة بسيطة."},{t:"الرافعة",bin:"s",why:"صحيح. آلة بسيطة."},{t:"البكرة",bin:"s",why:"صحيح. آلة بسيطة."},{t:"الإسفين",bin:"s",why:"صحيح. آلة بسيطة، مثل رأس الفأس."},
+    {t:"مفتاح العلب",bin:"c",why:"صحيح. مركّبة: رافعة (الذراع) مع إسفين (الشفرة التي تقطع)."},{t:"المقص",bin:"c",why:"صحيح. مركّبة: رافعتان مع إسفينين."},{t:"الدراجة",bin:"c",why:"صحيح. مركّبة: عجلات ومحاور وبكرات (التروس) وروافع."}],
+    bins:[{id:"s",label:"آلة بسيطة"},{id:"c",label:"آلة مركّبة"}]});
+  const q=el(`<div style="display:flex;flex-direction:column;gap:10px"></div>`);card.append(q);
+  await mcq(q,{q:"«مفتاح العلب يُعدّ من الآلات المركّبة.» هذه العبارة:",opts:[{t:"صواب",ok:true},{t:"خطأ",why:"مفتاح العلب يجمع رافعة وإسفيناً، أي آلتين بسيطتين."}],right:"صحيح.",doShuffle:false});
+  setSteps(5,TOTAL);
+  const b=el(`<button class="btn alt" type="button">احصلي على رمز الإنجاز</button>`);q.append(b);
+  b.onclick=()=>{setSteps(TOTAL,TOTAL);b.remove();const t=el(`<section class="card"></section>`);main.append(t);finish(t,CODE,[
+    "الشغل = القوة × المسافة (ش = ق × ف)، ووحدته الجول.",
+    "إذا لم يتحرك الجسم فالشغل صفر مهما كانت القوة.",
+    "المستوى المائل يقلّل القوة اللازمة، لكن المسافة تطول، ولا يقلّ الشغل.",
+    "الآلات البسيطة ست: الرافعة، والبكرة، والعجلة والمحور، والمستوى المائل، والإسفين، والبرغي.",
+    "الآلة البسيطة تسهّل العمل بتغيير مقدار القوة أو اتجاهها أو المسافة، لكنها لا تقلّل الشغل.",
+    "كلما اقتربت نقطة الارتكاز في الرافعة من الحمل، قلّت القوة اللازمة.",
+    "الآلة المركّبة تتكوّن من آلتين بسيطتين أو أكثر، مثل مفتاح العلب والمقص والدراجة."])};
+}
+
+main.append(el(`<section class="card"><p>في هذا المعمل تحسبين الشغل بنفسك، وتجرّبين المستوى المائل، وتميّزين الآلات البسيطة من المركّبة.</p></section>`));
+stage1();
+window.__labstep=async()=>{
+  if(window.__lv){const {P,lift}=window.__lv();if(lift&&lift.isConnected){P.value=2;P.dispatchEvent(new Event("input"));lift.click();await sleep(900);return true}}
+  if(window.__s1&&!window.__s1done){const {boxes,h,up}=window.__s1();boxes[2].click();h.value=2;h.dispatchEvent(new Event("input"));up.click();await sleep(1200);boxes[0].click();h.value=1;up.click();await sleep(1200);window.__s1done=1;return true}
+  if(window.__s2&&!window.__s2done){for(const b of window.__s2()){b.click();await sleep(2400)}window.__s2done=1;return true}
+  return false;
+};
+
+</script>

@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>[hidden]{display:none!important}</style>
+<title>معمل النماذج العلمية</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#f3f1ec; --surface:#ffffff; --ink:#1f2328; --muted:#5d6570; --line:#d9d4c9;
+  --stage:#e8eef2; --accent:#0f6e8c; --accent-soft:#dcedf3; --warm:#c2410c; --warm-soft:#fde9dc;
+  --ok:#1f7a4d; --ok-soft:#dff1e7; --bad:#b42318; --bad-soft:#fbe4e1;
+  --acid:#d1344a; --base:#2b5fd9; --neutral:#2f9e5a; --water:#7fb8e6; --glass:#c9d6de;
+  --display:"Readex Pro","IBM Plex Sans Arabic",Tahoma,sans-serif;
+  --body:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#14171b; --surface:#1c2026; --ink:#eceff3; --muted:#a3abb6; --line:#2e343c;
+  --stage:#1a242c; --accent:#5cc0e0; --accent-soft:#16323d; --warm:#ff8a4c; --warm-soft:#3b2116;
+  --ok:#5fd39a; --ok-soft:#173326; --bad:#ff8a7a; --bad-soft:#3a1d1a;
+  --acid:#ff6b7f; --base:#7aa2ff; --neutral:#5fd39a; --water:#3d6f99; --glass:#4a5863; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14171b; --surface:#1c2026; --ink:#eceff3; --muted:#a3abb6; --line:#2e343c;
+  --stage:#1a242c; --accent:#5cc0e0; --accent-soft:#16323d; --warm:#ff8a4c; --warm-soft:#3b2116;
+  --ok:#5fd39a; --ok-soft:#173326; --bad:#ff8a7a; --bad-soft:#3a1d1a;
+  --acid:#ff6b7f; --base:#7aa2ff; --neutral:#5fd39a; --water:#3d6f99; --glass:#4a5863; color-scheme:dark}
+html{direction:rtl}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.7}
+.wrap{max-width:860px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+.wrap>header{display:flex;flex-direction:column;gap:4px;padding-inline-end:110px}
+.eyebrow{font-size:13px;color:var(--muted)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(24px,5vw,32px);line-height:1.3;margin:0;text-wrap:balance}
+.steps{display:flex;gap:6px;list-style:none;margin:6px 0 0;padding:0}
+.steps li{flex:1;height:6px;border-radius:3px;background:var(--line)}
+.steps li.done{background:var(--accent)}
+.steps li.now{background:var(--warm)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.card h2{font-family:var(--display);font-weight:500;font-size:20px;margin:0}
+.card h3{font-family:var(--display);font-weight:500;font-size:17px;margin:0}
+.card p{margin:0;max-width:68ch}
+.muted{color:var(--muted);font-size:14px}
+.stage{background:var(--stage);border-radius:10px;overflow:hidden;position:relative}
+.stage svg{display:block;width:100%;height:auto}
+.opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:right;background:var(--bg);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.opt[disabled]{cursor:default}
+button:focus-visible,.chip:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn{font:inherit;font-weight:600;background:var(--warm);color:#fff;border:0;border-radius:10px;padding:12px 18px;cursor:pointer;align-self:flex-start}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.alt{background:var(--accent)}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.fb{border-radius:10px;padding:10px 14px;font-size:15px}
+.fb.ok{background:var(--ok-soft);color:var(--ok)}
+.fb.no{background:var(--bad-soft);color:var(--bad)}
+.fb.info{background:var(--accent-soft);color:var(--ink)}
+.done-card{border:2px solid var(--ok)}
+.code{font-family:var(--display);font-weight:700;font-size:44px;letter-spacing:.15em;direction:ltr;text-align:center;background:var(--ok-soft);color:var(--ok);border-radius:12px;padding:10px;font-variant-numeric:tabular-nums}
+ul.learned{margin:0;padding-inline-start:20px;display:grid;gap:4px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:15px;background:var(--surface);color:var(--ink);border:1.5px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--warm);background:var(--warm-soft)}
+.chip.placed{opacity:.35;cursor:default}
+.bins{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.bin{font:inherit;text-align:right;background:var(--bg);color:var(--ink);border:2px dashed var(--line);border-radius:12px;padding:10px 12px;min-height:96px;display:flex;flex-direction:column;gap:6px;cursor:pointer}
+.bin b{font-family:var(--display);font-weight:500;font-size:15px}
+.bin .in{display:flex;flex-wrap:wrap;gap:4px}
+.bin .in span{font-size:13px;background:var(--ok-soft);color:var(--ok);border-radius:999px;padding:2px 10px}
+.bin.ready{border-color:var(--warm)}
+.tablebox{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:460px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right}
+th{font-weight:600;color:var(--muted);font-size:13px}
+td.empty{color:var(--muted)}
+.slider{display:flex;flex-direction:column;gap:4px}
+.slider label{font-size:14px;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.slider output{font-variant-numeric:tabular-nums;color:var(--ink);font-weight:600}
+input[type=range]{width:100%;accent-color:var(--warm)}
+.seg{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:6px}
+.seg button{font:inherit;font-size:15px;background:var(--bg);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:8px 6px;cursor:pointer;line-height:1.35}
+.seg button small{display:block;color:var(--muted);font-size:12px}
+.seg button[aria-pressed="true"]{border-color:var(--warm);background:var(--warm-soft)}
+.seg button.tried{border-style:solid}
+.seg button.tried::after{content:" ✓";color:var(--ok);font-size:12px}
+.order{display:grid;gap:6px;counter-reset:n;padding:0;margin:0;list-style:none}
+.order li{background:var(--ok-soft);color:var(--ok);border-radius:10px;padding:8px 12px;counter-increment:n}
+.order li::before{content:counter(n) ". ";font-weight:700}
+.order li.slot{background:var(--bg);color:var(--muted);border:1.5px dashed var(--line)}
+.order li.slot::before{color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
+
+table{min-width:0}
+</style>
+<div class="wrap">
+<header><span class="eyebrow">معمل افتراضي · أول متوسط · طبيعة العلم</span><h1>النماذج العلمية</h1><ul class="steps" id="steps" aria-hidden="true"></ul></header>
+<main id="main" style="display:flex;flex-direction:column;gap:16px"></main>
+</div>
+<style>
+.fxglow{position:fixed;inset:0;pointer-events:none;z-index:30;opacity:0}
+.fxglow.ok{box-shadow:inset 0 0 0 6px #2fbf71,inset 0 0 90px 30px rgba(47,191,113,.55);animation:fxg 1s ease-out}
+.fxglow.no{box-shadow:inset 0 0 0 6px #e5484d,inset 0 0 90px 30px rgba(229,72,77,.45);animation:fxg .8s ease-out}
+@keyframes fxg{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
+.fxbadge{position:fixed;left:50%;top:40%;z-index:31;pointer-events:none;font-family:var(--display);font-weight:700;font-size:42px;color:#fff;background:#1f9d5c;padding:8px 30px;border-radius:999px;opacity:0;transform:translate(-50%,-50%) scale(.6)}
+.fxbadge.show{animation:fxb 1.1s ease-out}
+@keyframes fxb{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}35%{transform:translate(-50%,-50%) scale(1)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
+@media (prefers-reduced-motion:reduce){.fxbadge.show{animation:none;opacity:0}.fxglow.ok,.fxglow.no{animation-duration:.01s}}
+.wrap>header{padding-inline-end:110px}
+.sndbtn{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:calc(10px + env(safe-area-inset-left,0px));z-index:20;font:inherit;font-size:14px;background:var(--surface);color:var(--ink);border:1.5px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer}
+.sndbtn:focus-visible{outline:3px solid var(--plate);outline-offset:2px}
+</style>
+<button class="sndbtn" id="sndbtn" aria-pressed="true">الصوت: يعمل</button>
+<script>
+const SFX=(()=>{
+  let ac=null,on=true;
+  const btn=document.getElementById("sndbtn");
+  btn.onclick=()=>{on=!on;btn.setAttribute("aria-pressed",on);btn.textContent=on?"الصوت: يعمل":"الصوت: متوقف";};
+  const A=()=>{if(!on)return null;try{if(!ac)ac=new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();return ac}catch(e){return null}};
+  function tone(f,t0,d,type,vol,f2){const c=A();if(!c)return;const o=c.createOscillator(),g=c.createGain();o.type=type||"sine";o.frequency.setValueAtTime(f,c.currentTime+t0);if(f2)o.frequency.exponentialRampToValueAtTime(f2,c.currentTime+t0+d);g.gain.setValueAtTime(0,c.currentTime+t0);g.gain.linearRampToValueAtTime(vol||.2,c.currentTime+t0+.02);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t0+d);o.connect(g).connect(c.destination);o.start(c.currentTime+t0);o.stop(c.currentTime+t0+d+.05)}
+  function noise(t0,d,vol,fType,fFreq,fEnd){const c=A();if(!c)return;const n=c.sampleRate*d,b=c.createBuffer(1,n,c.sampleRate),x=b.getChannelData(0);for(let i=0;i<n;i++)x[i]=Math.random()*2-1;const s=c.createBufferSource();s.buffer=b;const f=c.createBiquadFilter();f.type=fType||"lowpass";f.frequency.setValueAtTime(fFreq||800,c.currentTime+t0);if(fEnd)f.frequency.exponentialRampToValueAtTime(fEnd,c.currentTime+t0+d);const g=c.createGain();g.gain.setValueAtTime(vol||.3,c.currentTime+t0);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t0+d);s.connect(f).connect(g).connect(c.destination);s.start(c.currentTime+t0)}
+  const fx=document.createElement("div");fx.className="fxglow";fx.setAttribute("aria-hidden","true");document.body.append(fx);
+  const badge=document.createElement("div");badge.className="fxbadge";badge.setAttribute("aria-hidden","true");badge.textContent="ممتاز";document.body.append(badge);
+  function glow(kind){fx.className="fxglow";badge.className="fxbadge";void fx.offsetWidth;fx.className="fxglow "+kind;if(kind==="ok"){void badge.offsetWidth;badge.className="fxbadge show"}}
+  const ding=()=>{tone(1318,0,.7,"sine",.22);tone(2637,0,.35,"sine",.06)};
+  const buzz=()=>{tone(150,0,.28,"square",.07,120)};
+  return{
+    good(){glow("ok");ding()},
+    bad(){glow("no");buzz()},
+    win(){glow("ok");ding();setTimeout(()=>tone(1568,0,.8,"sine",.2),220)},
+    tick(){tone(880,0,.08,"sine",.1)},
+    rumble(d,vol){noise(0,d||2,vol||.5,"lowpass",140,60)},
+    boom(){noise(0,2.5,1,"lowpass",900,40);tone(70,0,1.4,"sine",.6,30)},
+    bubble(){for(let i=0;i<10;i++)tone(300+Math.random()*500,i*.12+Math.random()*.05,.08,"sine",.07,700+Math.random()*400)},
+    hiss(d){noise(0,d||1.5,.15,"highpass",3000)},
+    whoosh(){noise(0,.6,.25,"bandpass",400,2400)},
+    thud(){tone(110,0,.25,"sine",.35,50)},
+  };
+})();
+</script>
+<script>
+// Shared helpers for all labs
+const $=(s,r=document)=>r.querySelector(s);
+const el=(html)=>{const t=document.createElement("template");t.innerHTML=html.trim();return t.content.childElementCount===1?t.content.firstElementChild:t.content};
+const shuffle=(a)=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
+const SVGNS="http://www.w3.org/2000/svg";
+function sv(tag,attrs,parent){const e=document.createElementNS(SVGNS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.append(e);return e}
+
+// Step bar
+function setSteps(n,total){const ul=$("#steps");ul.replaceChildren();for(let i=0;i<total;i++){const li=document.createElement("li");if(i<n)li.className="done";else if(i===n)li.className="now";ul.append(li)}}
+
+// Multiple-choice: must reach the right answer to continue. Returns promise resolved on correct.
+// opts: [{t:"text", ok:true/false, why:"explanation"}]
+function mcq(host,{q,opts,right,doShuffle=true}){
+  return new Promise(res=>{
+    const box=el(`<div class="opts" role="group"></div>`);
+    const fb=el(`<div class="fb" role="status" hidden></div>`);
+    if(q)host.append(el(`<p><b>${q}</b></p>`));
+    host.append(box,fb);
+    const list=doShuffle?shuffle(opts):opts;
+    let tries=0;
+    list.forEach(o=>{
+      const b=el(`<button class="opt" type="button">${o.t}</button>`);
+      b.onclick=()=>{
+        if(o.ok){
+          box.querySelectorAll(".opt").forEach(x=>x.disabled=true);
+          b.classList.add("right");fb.hidden=false;fb.className="fb ok";fb.textContent=right||o.why||"إجابة صحيحة.";SFX.good();res(tries)
+        }else{
+          tries++;b.classList.add("wrong");b.disabled=true;fb.hidden=false;fb.className="fb no";fb.textContent=o.why||"ليست هذه. فكّري مرة أخرى.";SFX.bad()
+        }
+      };
+      box.append(b);
+    });
+  });
+}
+
+// Tap-to-classify: pick a chip then a bin. items:[{t, bin, why}] bins:[{id,label,hint}]
+function classify(host,{items,bins,onPick}){
+  return new Promise(res=>{
+    const chips=el(`<div class="chips" aria-label="البطاقات"></div>`);
+    const binsEl=el(`<div class="bins"></div>`);
+    const fb=el(`<div class="fb info" role="status">اختاري بطاقة، ثم اختاري المجموعة المناسبة لها.</div>`);
+    host.append(chips,binsEl,fb);
+    let sel=null,left=items.length;
+    const binBtns={};
+    bins.forEach(b=>{
+      const bb=el(`<button class="bin" type="button"><b>${b.label}</b>${b.hint?`<span class="muted">${b.hint}</span>`:""}<span class="in"></span></button>`);
+      bb.onclick=()=>{
+        if(!sel){fb.className="fb info";fb.textContent="اختاري بطاقة أولاً.";return}
+        const it=sel.item;
+        if(it.bin===b.id){
+          bb.querySelector(".in").append(el(`<span>${it.t}</span>`));
+          sel.btn.classList.add("placed");sel.btn.disabled=true;sel.btn.setAttribute("aria-pressed","false");
+          fb.className="fb ok";fb.textContent=it.why||"صحيح.";SFX.good();sel=null;left--;
+          Object.values(binBtns).forEach(x=>x.classList.remove("ready"));
+          if(left===0)res();
+        }else{
+          fb.className="fb no";fb.textContent=it.hintWrong||"ليست هذه المجموعة. انظري إلى المادة مرة أخرى.";SFX.bad();
+        }
+      };
+      binBtns[b.id]=bb;binsEl.append(bb);
+    });
+    shuffle(items).forEach(it=>{
+      const c=el(`<button class="chip" type="button" aria-pressed="false">${it.t}</button>`);
+      c.onclick=()=>{
+        chips.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed","false"));
+        c.setAttribute("aria-pressed","true");sel={item:it,btn:c};SFX.tick();
+        Object.values(binBtns).forEach(x=>x.classList.add("ready"));
+        fb.className="fb info";fb.textContent="«"+it.t+"»: إلى أي مجموعة تنتمي؟";
+        if(onPick)onPick(it);
+      };
+      chips.append(c);
+    });
+  });
+}
+
+// Final screen with code
+function finish(task,code,learned){
+  SFX.win();
+  task.classList.add("done-card");
+  task.replaceChildren(el(`<div><h2>أنهيتِ المعمل</h2><p>رمز الإنجاز الخاص بهذا المعمل:</p><div class="code">${code}</div><p>عودي إلى النموذج واكتبي هذا الرمز، ثم أجيبي عن السؤال.</p><h2 style="margin-top:12px">ما تعلمتِه</h2><ul class="learned">${learned.map(x=>`<li>${x}</li>`).join("")}</ul></div>`));
+  task.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+</script>
+<script>
+const CODE="6347";
+const main=$("#main");
+const TOTAL=4;
+
+async function stage1(){
+  setSteps(0,TOTAL);
+  const card=el(`<section class="card"><h2>١. ما نوع هذا النموذج؟</h2>
+  <p>النموذج يمثّل شيئاً حقيقياً حتى نفهمه بسهولة. للنماذج ثلاثة أنواع:</p>
+  <div class="tablebox"><table><thead><tr><th>النوع</th><th>معناه</th></tr></thead><tbody>
+  <tr><td><b>نموذج مادي</b></td><td>مجسّم تلمسينه وترينه</td></tr>
+  <tr><td><b>نموذج حاسوبي</b></td><td>برنامج على الحاسوب يحاكي الشيء الحقيقي</td></tr>
+  <tr><td><b>نموذج فكري</b></td><td>فكرة أو رسم أو معادلة تشرح شيئاً</td></tr></tbody></table></div>
+  <p><b>صنّفي النماذج الآتية:</b></p></section>`);
+  main.append(card);
+  await classify(card,{items:[
+    {t:"مجسّم الكرة الأرضية",bin:"m",why:"صحيح. مجسّم تلمسينه: نموذج مادي."},
+    {t:"مجسّم للمجموعة الشمسية",bin:"m",why:"صحيح. نموذج مادي."},
+    {t:"لعبة طائرة يُجرّب عليها المهندسون",bin:"m",why:"صحيح. نموذج مادي مصغّر."},
+    {t:"برنامج يتوقّع حالة الطقس",bin:"c",why:"صحيح. برنامج حاسوبي يحاكي الجو."},
+    {t:"لعبة محاكاة لقيادة السيارة",bin:"c",why:"صحيح. نموذج حاسوبي."},
+    {t:"رسم يوضّح أجزاء الذرة",bin:"i",why:"صحيح. فكرة مرسومة: نموذج فكري."},
+    {t:"قانون: السرعة = المسافة ÷ الزمن",bin:"i",why:"صحيح. المعادلة نموذج فكري."}],
+    bins:[{id:"m",label:"نموذج مادي"},{id:"c",label:"نموذج حاسوبي"},{id:"i",label:"نموذج فكري"}]});
+  const n=el(`<button class="btn" type="button">التالي</button>`);card.append(n);n.onclick=()=>{n.remove();stage2()};
+}
+
+async function stage2(){
+  setSteps(1,TOTAL);
+  const card=el(`<section class="card"><h2>٢. لماذا يستخدم العلماء النماذج؟</h2>
+  <p>لا يستطيع العالِم أحياناً أن يدرس الشيء الحقيقي مباشرة. صِلي كل شيء بسبب حاجتنا إلى نموذج له.</p></section>`);
+  main.append(card);card.scrollIntoView({behavior:"smooth",block:"start"});
+  await classify(card,{items:[
+    {t:"الذرة",bin:"small",why:"صحيح. الذرة أصغر من أن نراها."},
+    {t:"الخلية",bin:"small",why:"صحيح. لا تُرى بالعين المجردة."},
+    {t:"المجموعة الشمسية",bin:"big",why:"صحيح. أكبر من أن نراها كلها مرة واحدة."},
+    {t:"البركان",bin:"danger",why:"صحيح. الاقتراب منه خطر."},
+    {t:"الزلزال",bin:"danger",why:"صحيح. لا يمكن إحداثه أو الاقتراب منه بأمان."},
+    {t:"الديناصورات",bin:"past",why:"صحيح. انقرضت قبل ملايين السنين."}],
+    bins:[{id:"small",label:"صغير جداً"},{id:"big",label:"كبير جداً"},{id:"danger",label:"خطير"},{id:"past",label:"حدث في الماضي"}]});
+  const n=el(`<button class="btn" type="button">التالي</button>`);card.append(n);n.onclick=()=>{n.remove();stage3()};
+}
+
+function stage3(){
+  setSteps(2,TOTAL);
+  const card=el(`<section class="card"><h2>٣. ابني نموذجاً بمقياس رسم</h2>
+  <p>طول فصلكِ الحقيقي 8 أمتار وعرضه 6 أمتار. ابني نموذجاً له على الورق بمقياس: <b>1 سم في النموذج = 1 م في الحقيقة</b>.</p>
+  <div class="stage" id="room"></div>
+  <div class="slider"><label>طول النموذج <output id="oa">4 سم</output></label><input type="range" id="a" min="2" max="12" step="1" value="4" aria-label="طول النموذج"></div>
+  <div class="slider"><label>عرض النموذج <output id="ob">4 سم</output></label><input type="range" id="b" min="2" max="12" step="1" value="4" aria-label="عرض النموذج"></div>
+  <button class="btn alt" type="button" id="chk">تحققي من النموذج</button>
+  <div id="fb3"></div></section>`);
+  main.append(card);card.scrollIntoView({behavior:"smooth",block:"start"});
+  const s=sv("svg",{viewBox:"0 0 400 200",role:"img","aria-label":"مخطط نموذج للفصل على ورقة مربعات"},$("#room",card));
+  for(let x=20;x<=380;x+=25)sv("line",{x1:x,y1:10,x2:x,y2:190,stroke:"var(--line)"},s);
+  for(let y=10;y<=190;y+=25)sv("line",{x1:20,y1:y,x2:380,y2:y,stroke:"var(--line)"},s);
+  const r=sv("rect",{x:20,y:10,fill:"var(--accent-soft)",stroke:"var(--accent)","stroke-width":3},s);
+  function draw(){const a=+$("#a",card).value,b=+$("#b",card).value;$("#oa",card).textContent=a+" سم";$("#ob",card).textContent=b+" سم";r.setAttribute("width",Math.min(360,a*25));r.setAttribute("height",Math.min(180,b*25))}
+  ["a","b"].forEach(i=>$("#"+i,card).oninput=()=>{SFX.tick();draw()});draw();
+  $("#chk",card).onclick=async()=>{
+    const a=+$("#a",card).value,b=+$("#b",card).value,f=$("#fb3",card);
+    if(a===8&&b===6){SFX.good();$("#chk",card).remove();card.querySelectorAll("input").forEach(i=>i.disabled=true);
+      f.replaceChildren(el(`<div class="fb ok">نموذج دقيق! كل 1 سم يمثّل 1 م، فالطول 8 سم والعرض 6 سم.</div>`));
+      const q=el(`<div style="display:flex;flex-direction:column;gap:10px;margin-top:10px"></div>`);f.append(q);
+      await mcq(q,{q:"رسمت سارة مخططاً لغرفتها بالمقياس نفسه: 1 سم = 1 م. طول غرفتها 5 م، فكم يكون طولها في المخطط؟",opts:[{t:"5 سم",ok:true},{t:"50 سم",why:"كل 1 م في الحقيقة يصبح 1 سم فقط في المخطط."},{t:"1 سم",why:"الـ 1 سم يمثّل متراً واحداً فقط، والغرفة 5 أمتار."}],right:"صحيح: 5 أمتار تصبح 5 سم."});
+      ask(q);
+    }else{SFX.bad();f.replaceChildren(el(`<div class="fb no">${a!==8?`الطول الحقيقي 8 م، فكم سنتيمتراً يكون في النموذج؟`:`الطول صحيح. العرض الحقيقي 6 م، فكم سنتيمتراً يكون؟`}</div>`))}
+  };
+  async function ask(q){
+    q.append(el(`<h3 style="margin-top:6px">حدود النماذج</h3><p>تغيّر نموذج الذرة عدة مرات عبر التاريخ: من كرة مصمتة، إلى كرة فيها شحنات، إلى نواة تدور حولها إلكترونات.</p>`));
+    await mcq(q,{q:"لماذا يغيّر العلماء نماذجهم أحياناً؟",opts:[{t:"لأنهم يكتشفون معلومات جديدة لا يفسّرها النموذج القديم",ok:true},{t:"لأن النموذج القديم أصبح قديم الشكل",why:"الشكل ليس السبب. النموذج يتغيّر حين تظهر أدلة جديدة."},{t:"لأن النماذج دائماً خاطئة",why:"النماذج مفيدة جداً، لكنها تتحسّن مع زيادة المعرفة."}],right:"صحيح. النماذج تتطوّر كلما اكتشف العلماء معلومات جديدة."});
+    await mcq(q,{q:"أيّ العبارات الآتية صحيحة عن النماذج؟",opts:[{t:"النموذج لا يمثّل كل تفاصيل الشيء الحقيقي",ok:true},{t:"النموذج نسخة مطابقة تماماً للشيء الحقيقي",why:"مجسّم الأرض مثلاً لا يُظهر البيوت والأشجار. النموذج يبسّط الحقيقة."},{t:"النماذج تُستخدم للأشياء الكبيرة فقط",why:"تُستخدم أيضاً للأشياء الصغيرة جداً مثل الذرة والخلية."}],right:"صحيح. لكل نموذج حدود."});
+    setSteps(3,TOTAL);
+    const b=el(`<button class="btn alt" type="button">احصلي على رمز الإنجاز</button>`);q.append(b);
+    b.onclick=()=>{setSteps(TOTAL,TOTAL);b.remove();const t=el(`<section class="card"></section>`);main.append(t);finish(t,CODE,[
+      "النموذج تمثيل لشيء حقيقي يساعدنا على فهمه.",
+      "أنواع النماذج: مادية (مجسّمات)، وحاسوبية (برامج محاكاة)، وفكرية (رسوم ومعادلات وأفكار).",
+      "نستخدم النماذج لما هو صغير جداً أو كبير جداً أو خطير أو حدث في الماضي.",
+      "مقياس الرسم يحدد العلاقة بين أبعاد النموذج والأبعاد الحقيقية.",
+      "للنماذج حدود، وتتغيّر حين يكتشف العلماء معلومات جديدة."])};
+  }
+  window.__s3=()=>({a:$("#a",card),b:$("#b",card),chk:$("#chk",card)});
+}
+
+main.append(el(`<section class="card"><p>في هذا المعمل تتعرّفين أنواع النماذج العلمية، وتبنين نموذجاً بنفسك بمقياس رسم.</p></section>`));
+stage1();
+window.__labstep=async()=>{if(window.__s3){const {a,b,chk}=window.__s3();if(chk&&chk.isConnected){a.value=8;b.value=6;a.dispatchEvent(new Event("input"));chk.click();await sleep(300);return true}}return false};
+
+</script>

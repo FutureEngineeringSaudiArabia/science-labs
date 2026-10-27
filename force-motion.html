@@ -1,0 +1,407 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>[hidden]{display:none!important}</style>
+<title>معمل القوة والحركة</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#f3f1ec; --surface:#ffffff; --ink:#1f2328; --muted:#5d6570; --line:#d9d4c9;
+  --stage:#e8eef2; --accent:#0f6e8c; --accent-soft:#dcedf3; --warm:#c2410c; --warm-soft:#fde9dc;
+  --ok:#1f7a4d; --ok-soft:#dff1e7; --bad:#b42318; --bad-soft:#fbe4e1;
+  --acid:#d1344a; --base:#2b5fd9; --neutral:#2f9e5a; --water:#7fb8e6; --glass:#c9d6de;
+  --display:"Readex Pro","IBM Plex Sans Arabic",Tahoma,sans-serif;
+  --body:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#14171b; --surface:#1c2026; --ink:#eceff3; --muted:#a3abb6; --line:#2e343c;
+  --stage:#1a242c; --accent:#5cc0e0; --accent-soft:#16323d; --warm:#ff8a4c; --warm-soft:#3b2116;
+  --ok:#5fd39a; --ok-soft:#173326; --bad:#ff8a7a; --bad-soft:#3a1d1a;
+  --acid:#ff6b7f; --base:#7aa2ff; --neutral:#5fd39a; --water:#3d6f99; --glass:#4a5863; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14171b; --surface:#1c2026; --ink:#eceff3; --muted:#a3abb6; --line:#2e343c;
+  --stage:#1a242c; --accent:#5cc0e0; --accent-soft:#16323d; --warm:#ff8a4c; --warm-soft:#3b2116;
+  --ok:#5fd39a; --ok-soft:#173326; --bad:#ff8a7a; --bad-soft:#3a1d1a;
+  --acid:#ff6b7f; --base:#7aa2ff; --neutral:#5fd39a; --water:#3d6f99; --glass:#4a5863; color-scheme:dark}
+html{direction:rtl}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.7}
+.wrap{max-width:860px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+.wrap>header{display:flex;flex-direction:column;gap:4px;padding-inline-end:110px}
+.eyebrow{font-size:13px;color:var(--muted)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(24px,5vw,32px);line-height:1.3;margin:0;text-wrap:balance}
+.steps{display:flex;gap:6px;list-style:none;margin:6px 0 0;padding:0}
+.steps li{flex:1;height:6px;border-radius:3px;background:var(--line)}
+.steps li.done{background:var(--accent)}
+.steps li.now{background:var(--warm)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.card h2{font-family:var(--display);font-weight:500;font-size:20px;margin:0}
+.card h3{font-family:var(--display);font-weight:500;font-size:17px;margin:0}
+.card p{margin:0;max-width:68ch}
+.muted{color:var(--muted);font-size:14px}
+.stage{background:var(--stage);border-radius:10px;overflow:hidden;position:relative}
+.stage svg{display:block;width:100%;height:auto}
+.opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:right;background:var(--bg);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.opt[disabled]{cursor:default}
+button:focus-visible,.chip:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn{font:inherit;font-weight:600;background:var(--warm);color:#fff;border:0;border-radius:10px;padding:12px 18px;cursor:pointer;align-self:flex-start}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.alt{background:var(--accent)}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.fb{border-radius:10px;padding:10px 14px;font-size:15px}
+.fb.ok{background:var(--ok-soft);color:var(--ok)}
+.fb.no{background:var(--bad-soft);color:var(--bad)}
+.fb.info{background:var(--accent-soft);color:var(--ink)}
+.done-card{border:2px solid var(--ok)}
+.code{font-family:var(--display);font-weight:700;font-size:44px;letter-spacing:.15em;direction:ltr;text-align:center;background:var(--ok-soft);color:var(--ok);border-radius:12px;padding:10px;font-variant-numeric:tabular-nums}
+ul.learned{margin:0;padding-inline-start:20px;display:grid;gap:4px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:15px;background:var(--surface);color:var(--ink);border:1.5px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--warm);background:var(--warm-soft)}
+.chip.placed{opacity:.35;cursor:default}
+.bins{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.bin{font:inherit;text-align:right;background:var(--bg);color:var(--ink);border:2px dashed var(--line);border-radius:12px;padding:10px 12px;min-height:96px;display:flex;flex-direction:column;gap:6px;cursor:pointer}
+.bin b{font-family:var(--display);font-weight:500;font-size:15px}
+.bin .in{display:flex;flex-wrap:wrap;gap:4px}
+.bin .in span{font-size:13px;background:var(--ok-soft);color:var(--ok);border-radius:999px;padding:2px 10px}
+.bin.ready{border-color:var(--warm)}
+.tablebox{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:460px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right}
+th{font-weight:600;color:var(--muted);font-size:13px}
+td.empty{color:var(--muted)}
+.slider{display:flex;flex-direction:column;gap:4px}
+.slider label{font-size:14px;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.slider output{font-variant-numeric:tabular-nums;color:var(--ink);font-weight:600}
+input[type=range]{width:100%;accent-color:var(--warm)}
+.seg{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:6px}
+.seg button{font:inherit;font-size:15px;background:var(--bg);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:8px 6px;cursor:pointer;line-height:1.35}
+.seg button small{display:block;color:var(--muted);font-size:12px}
+.seg button[aria-pressed="true"]{border-color:var(--warm);background:var(--warm-soft)}
+.seg button.tried{border-style:solid}
+.seg button.tried::after{content:" ✓";color:var(--ok);font-size:12px}
+.order{display:grid;gap:6px;counter-reset:n;padding:0;margin:0;list-style:none}
+.order li{background:var(--ok-soft);color:var(--ok);border-radius:10px;padding:8px 12px;counter-increment:n}
+.order li::before{content:counter(n) ". ";font-weight:700}
+.order li.slot{background:var(--bg);color:var(--muted);border:1.5px dashed var(--line)}
+.order li.slot::before{color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
+
+table{min-width:0}
+</style>
+<div class="wrap">
+<header><span class="eyebrow">معمل افتراضي · أول متوسط · الحركة والقوة</span><h1>السرعة والقوة المحصلة والاحتكاك</h1><ul class="steps" id="steps" aria-hidden="true"></ul></header>
+<main id="main" style="display:flex;flex-direction:column;gap:16px"></main>
+</div>
+<style>
+.fxglow{position:fixed;inset:0;pointer-events:none;z-index:30;opacity:0}
+.fxglow.ok{box-shadow:inset 0 0 0 6px #2fbf71,inset 0 0 90px 30px rgba(47,191,113,.55);animation:fxg 1s ease-out}
+.fxglow.no{box-shadow:inset 0 0 0 6px #e5484d,inset 0 0 90px 30px rgba(229,72,77,.45);animation:fxg .8s ease-out}
+@keyframes fxg{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
+.fxbadge{position:fixed;left:50%;top:40%;z-index:31;pointer-events:none;font-family:var(--display);font-weight:700;font-size:42px;color:#fff;background:#1f9d5c;padding:8px 30px;border-radius:999px;opacity:0;transform:translate(-50%,-50%) scale(.6)}
+.fxbadge.show{animation:fxb 1.1s ease-out}
+@keyframes fxb{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}35%{transform:translate(-50%,-50%) scale(1)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
+@media (prefers-reduced-motion:reduce){.fxbadge.show{animation:none;opacity:0}.fxglow.ok,.fxglow.no{animation-duration:.01s}}
+.wrap>header{padding-inline-end:110px}
+.sndbtn{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:calc(10px + env(safe-area-inset-left,0px));z-index:20;font:inherit;font-size:14px;background:var(--surface);color:var(--ink);border:1.5px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer}
+.sndbtn:focus-visible{outline:3px solid var(--plate);outline-offset:2px}
+</style>
+<button class="sndbtn" id="sndbtn" aria-pressed="true">الصوت: يعمل</button>
+<script>
+const SFX=(()=>{
+  let ac=null,on=true;
+  const btn=document.getElementById("sndbtn");
+  btn.onclick=()=>{on=!on;btn.setAttribute("aria-pressed",on);btn.textContent=on?"الصوت: يعمل":"الصوت: متوقف";};
+  const A=()=>{if(!on)return null;try{if(!ac)ac=new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();return ac}catch(e){return null}};
+  function tone(f,t0,d,type,vol,f2){const c=A();if(!c)return;const o=c.createOscillator(),g=c.createGain();o.type=type||"sine";o.frequency.setValueAtTime(f,c.currentTime+t0);if(f2)o.frequency.exponentialRampToValueAtTime(f2,c.currentTime+t0+d);g.gain.setValueAtTime(0,c.currentTime+t0);g.gain.linearRampToValueAtTime(vol||.2,c.currentTime+t0+.02);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t0+d);o.connect(g).connect(c.destination);o.start(c.currentTime+t0);o.stop(c.currentTime+t0+d+.05)}
+  function noise(t0,d,vol,fType,fFreq,fEnd){const c=A();if(!c)return;const n=c.sampleRate*d,b=c.createBuffer(1,n,c.sampleRate),x=b.getChannelData(0);for(let i=0;i<n;i++)x[i]=Math.random()*2-1;const s=c.createBufferSource();s.buffer=b;const f=c.createBiquadFilter();f.type=fType||"lowpass";f.frequency.setValueAtTime(fFreq||800,c.currentTime+t0);if(fEnd)f.frequency.exponentialRampToValueAtTime(fEnd,c.currentTime+t0+d);const g=c.createGain();g.gain.setValueAtTime(vol||.3,c.currentTime+t0);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t0+d);s.connect(f).connect(g).connect(c.destination);s.start(c.currentTime+t0)}
+  const fx=document.createElement("div");fx.className="fxglow";fx.setAttribute("aria-hidden","true");document.body.append(fx);
+  const badge=document.createElement("div");badge.className="fxbadge";badge.setAttribute("aria-hidden","true");badge.textContent="ممتاز";document.body.append(badge);
+  function glow(kind){fx.className="fxglow";badge.className="fxbadge";void fx.offsetWidth;fx.className="fxglow "+kind;if(kind==="ok"){void badge.offsetWidth;badge.className="fxbadge show"}}
+  const ding=()=>{tone(1318,0,.7,"sine",.22);tone(2637,0,.35,"sine",.06)};
+  const buzz=()=>{tone(150,0,.28,"square",.07,120)};
+  return{
+    good(){glow("ok");ding()},
+    bad(){glow("no");buzz()},
+    win(){glow("ok");ding();setTimeout(()=>tone(1568,0,.8,"sine",.2),220)},
+    tick(){tone(880,0,.08,"sine",.1)},
+    rumble(d,vol){noise(0,d||2,vol||.5,"lowpass",140,60)},
+    boom(){noise(0,2.5,1,"lowpass",900,40);tone(70,0,1.4,"sine",.6,30)},
+    bubble(){for(let i=0;i<10;i++)tone(300+Math.random()*500,i*.12+Math.random()*.05,.08,"sine",.07,700+Math.random()*400)},
+    hiss(d){noise(0,d||1.5,.15,"highpass",3000)},
+    whoosh(){noise(0,.6,.25,"bandpass",400,2400)},
+    thud(){tone(110,0,.25,"sine",.35,50)},
+  };
+})();
+</script>
+<script>
+// Shared helpers for all labs
+const $=(s,r=document)=>r.querySelector(s);
+const el=(html)=>{const t=document.createElement("template");t.innerHTML=html.trim();return t.content.childElementCount===1?t.content.firstElementChild:t.content};
+const shuffle=(a)=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
+const SVGNS="http://www.w3.org/2000/svg";
+function sv(tag,attrs,parent){const e=document.createElementNS(SVGNS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.append(e);return e}
+
+// Step bar
+function setSteps(n,total){const ul=$("#steps");ul.replaceChildren();for(let i=0;i<total;i++){const li=document.createElement("li");if(i<n)li.className="done";else if(i===n)li.className="now";ul.append(li)}}
+
+// Multiple-choice: must reach the right answer to continue. Returns promise resolved on correct.
+// opts: [{t:"text", ok:true/false, why:"explanation"}]
+function mcq(host,{q,opts,right,doShuffle=true}){
+  return new Promise(res=>{
+    const box=el(`<div class="opts" role="group"></div>`);
+    const fb=el(`<div class="fb" role="status" hidden></div>`);
+    if(q)host.append(el(`<p><b>${q}</b></p>`));
+    host.append(box,fb);
+    const list=doShuffle?shuffle(opts):opts;
+    let tries=0;
+    list.forEach(o=>{
+      const b=el(`<button class="opt" type="button">${o.t}</button>`);
+      b.onclick=()=>{
+        if(o.ok){
+          box.querySelectorAll(".opt").forEach(x=>x.disabled=true);
+          b.classList.add("right");fb.hidden=false;fb.className="fb ok";fb.textContent=right||o.why||"إجابة صحيحة.";SFX.good();res(tries)
+        }else{
+          tries++;b.classList.add("wrong");b.disabled=true;fb.hidden=false;fb.className="fb no";fb.textContent=o.why||"ليست هذه. فكّري مرة أخرى.";SFX.bad()
+        }
+      };
+      box.append(b);
+    });
+  });
+}
+
+// Tap-to-classify: pick a chip then a bin. items:[{t, bin, why}] bins:[{id,label,hint}]
+function classify(host,{items,bins,onPick}){
+  return new Promise(res=>{
+    const chips=el(`<div class="chips" aria-label="البطاقات"></div>`);
+    const binsEl=el(`<div class="bins"></div>`);
+    const fb=el(`<div class="fb info" role="status">اختاري بطاقة، ثم اختاري المجموعة المناسبة لها.</div>`);
+    host.append(chips,binsEl,fb);
+    let sel=null,left=items.length;
+    const binBtns={};
+    bins.forEach(b=>{
+      const bb=el(`<button class="bin" type="button"><b>${b.label}</b>${b.hint?`<span class="muted">${b.hint}</span>`:""}<span class="in"></span></button>`);
+      bb.onclick=()=>{
+        if(!sel){fb.className="fb info";fb.textContent="اختاري بطاقة أولاً.";return}
+        const it=sel.item;
+        if(it.bin===b.id){
+          bb.querySelector(".in").append(el(`<span>${it.t}</span>`));
+          sel.btn.classList.add("placed");sel.btn.disabled=true;sel.btn.setAttribute("aria-pressed","false");
+          fb.className="fb ok";fb.textContent=it.why||"صحيح.";SFX.good();sel=null;left--;
+          Object.values(binBtns).forEach(x=>x.classList.remove("ready"));
+          if(left===0)res();
+        }else{
+          fb.className="fb no";fb.textContent=it.hintWrong||"ليست هذه المجموعة. انظري إلى المادة مرة أخرى.";SFX.bad();
+        }
+      };
+      binBtns[b.id]=bb;binsEl.append(bb);
+    });
+    shuffle(items).forEach(it=>{
+      const c=el(`<button class="chip" type="button" aria-pressed="false">${it.t}</button>`);
+      c.onclick=()=>{
+        chips.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed","false"));
+        c.setAttribute("aria-pressed","true");sel={item:it,btn:c};SFX.tick();
+        Object.values(binBtns).forEach(x=>x.classList.add("ready"));
+        fb.className="fb info";fb.textContent="«"+it.t+"»: إلى أي مجموعة تنتمي؟";
+        if(onPick)onPick(it);
+      };
+      chips.append(c);
+    });
+  });
+}
+
+// Final screen with code
+function finish(task,code,learned){
+  SFX.win();
+  task.classList.add("done-card");
+  task.replaceChildren(el(`<div><h2>أنهيتِ المعمل</h2><p>رمز الإنجاز الخاص بهذا المعمل:</p><div class="code">${code}</div><p>عودي إلى النموذج واكتبي هذا الرمز، ثم أجيبي عن السؤال.</p><h2 style="margin-top:12px">ما تعلمتِه</h2><ul class="learned">${learned.map(x=>`<li>${x}</li>`).join("")}</ul></div>`));
+  task.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+</script>
+<script>
+const CODE="4182";
+const main=$("#main");
+const TOTAL=4;
+
+// ============ Stage 1: speed and velocity ============
+function stage1(){
+  setSteps(0,TOTAL);
+  const card=el(`<section class="card"><h2>١. سباق السيارتين: السرعة</h2>
+  <p>السرعة = المسافة ÷ الزمن. شغّلي كل رحلة، وراقبي المسافة والزمن، ثم احسبي السرعة.</p>
+  <div class="stage" id="road"></div>
+  <div class="seg" id="trips"></div>
+  <div id="s1q"></div></section>`);
+  main.append(card);
+  const TR=[{n:"الرحلة أ",d:100,t:20,c:"#c2410c"},{n:"الرحلة ب",d:150,t:10,c:"#0f6e8c"}];
+  const s=sv("svg",{viewBox:"0 0 400 120",role:"img","aria-label":"طريق مستقيم وسيارة"},$("#road",card));
+  sv("rect",{x:0,y:70,width:400,height:34,fill:"#6b7280"},s);
+  for(let x=10;x<400;x+=40)sv("rect",{x,y:85,width:20,height:4,fill:"#f8fafc"},s);
+  for(let i=0;i<=5;i++){const x=30+i*68;sv("line",{x1:x,y1:104,x2:x,y2:112,stroke:"var(--ink)"},s);const t=sv("text",{x,y:118,"text-anchor":"middle","font-size":9,fill:"var(--ink)"},s);t.textContent=(i*30)+" م"}
+  const car=sv("g",{},s);
+  const body=sv("rect",{x:0,y:52,width:44,height:18,rx:5,fill:"#c2410c"},car);
+  sv("rect",{x:9,y:42,width:24,height:12,rx:4,fill:"#94a3b8"},car);
+  sv("circle",{cx:10,cy:72,r:6,fill:"#1f2328"},car);sv("circle",{cx:34,cy:72,r:6,fill:"#1f2328"},car);
+  const info=sv("text",{x:200,y:22,"text-anchor":"middle","font-size":13,"font-weight":700,fill:"var(--ink)"},s);
+  const place=x=>car.setAttribute("transform",`translate(${8+x},0)`);place(0);
+  const done=new Set();let busy=false;
+  TR.forEach((tr,i)=>{
+    const b=el(`<button type="button" aria-pressed="false">${tr.n}<small>${tr.d} م</small></button>`);
+    b.onclick=async()=>{
+      if(busy||done.has(i))return;busy=true;body.setAttribute("fill",tr.c);
+      $("#trips",card).querySelectorAll("button").forEach(z=>z.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");
+      const px=tr.d/150*340;const ms=tr.t*110;const t0=performance.now();SFX.whoosh();
+      await new Promise(r=>{function f(n){const k=Math.min(1,(n-t0)/ms);place(px*k);info.textContent=`المسافة ${Math.round(tr.d*k)} م · الزمن ${(tr.t*k).toFixed(0)} ث`;if(k<1)requestAnimationFrame(f);else r()}requestAnimationFrame(f)});
+      const q=el(`<div style="display:flex;flex-direction:column;gap:8px"></div>`);$("#s1q",card).append(q);
+      const v=tr.d/tr.t;
+      await mcq(q,{q:`${tr.n}: قطعت السيارة ${tr.d} متر في ${tr.t} ثانية. ما سرعتها؟`,opts:[
+        {t:`${v} م/ث`,ok:true},{t:`${tr.d*tr.t} م/ث`,why:"ضربتِ المسافة في الزمن. السرعة = المسافة ÷ الزمن."},{t:`${+(tr.t/tr.d).toFixed(2)} م/ث`,why:"قسمتِ الزمن على المسافة. السرعة = المسافة ÷ الزمن."}],
+        right:`صحيح: ${tr.d} ÷ ${tr.t} = ${v} م/ث.`});
+      done.add(i);b.classList.add("tried");busy=false;place(0);info.textContent="";
+      if(done.size===TR.length)velocity();
+      else q.append(el(`<p class="muted">شغّلي الرحلة الأخرى.</p>`));
+    };
+    $("#trips",card).append(b);
+  });
+  async function velocity(){
+    const q=el(`<div style="display:flex;flex-direction:column;gap:10px"></div>`);card.append(q);
+    await mcq(q,{q:"أيّ الرحلتين كانت أسرع؟",opts:[{t:"الرحلة ب (15 م/ث)",ok:true},{t:"الرحلة أ (5 م/ث)",why:"قارني الناتجين: 15 م/ث أكبر من 5 م/ث."},{t:"متساويتان",why:"الناتجان مختلفان: 5 م/ث و15 م/ث."}],right:"صحيح. الرحلة ب قطعت مسافة أكبر في زمن أقل."});
+    q.append(el(`<h3 style="margin-top:6px">السرعة المتجهة</h3><p>سيارتان سرعة كل منهما 15 م/ث، الأولى تتجه شرقاً والثانية تتجه غرباً.</p>`));
+    const s2=sv("svg",{viewBox:"0 0 400 70",role:"img","aria-label":"سيارتان في اتجاهين متعاكسين"});
+    const st=el(`<div class="stage"></div>`);st.append(s2);q.append(st);
+    [[200,"#c2410c",1,"15 م/ث شرقاً"],[200,"#0f6e8c",-1,"15 م/ث غرباً"]].forEach(([x,c,d,l],i)=>{
+      const y=i?52:20;sv("rect",{x:x-20,y:y-8,width:40,height:16,rx:4,fill:c},s2);
+      sv("line",{x1:x+d*24,y1:y,x2:x+d*80,y2:y,stroke:c,"stroke-width":4},s2);
+      sv("path",{d:`M${x+d*90} ${y} L${x+d*78} ${y-7} L${x+d*78} ${y+7} Z`,fill:c},s2);
+      const t=sv("text",{x:x-d*70,y:y+4,"text-anchor":"middle","font-size":11,fill:"var(--ink)"},s2);t.textContent=l});
+    await mcq(q,{q:"هل للسيارتين السرعة المتجهة نفسها؟",opts:[
+      {t:"لا؛ لأن اتجاه حركتهما مختلف",ok:true},
+      {t:"نعم؛ لأن مقدار السرعة واحد",why:"السرعة المتجهة تشمل المقدار والاتجاه معاً، والاتجاهان مختلفان."},
+      {t:"نعم؛ لأنهما سيارتان متشابهتان",why:"شكل السيارة لا علاقة له. انظري إلى الاتجاه."}],right:"صحيح. السرعة المتجهة هي مقدار السرعة واتجاه الحركة معاً."});
+    const n=el(`<button class="btn" type="button">التالي</button>`);q.append(n);n.onclick=()=>{n.remove();stage2()};
+  }
+}
+
+// ============ Stage 2: net force ============
+function stage2(){
+  setSteps(1,TOTAL);
+  const card=el(`<section class="card"><h2>٢. شدّ الحبل: القوة المحصلة</h2>
+  <p>تدفع مريم الصندوق من اليسار، وتدفعه سارة من اليمين. غيّري القوتين، ثم اضغطي «شاهدي ماذا يحدث».</p>
+  <div class="stage" id="box"></div>
+  <div class="slider"><label>قوة مريم (تدفع لليمين) <output id="oL">40 نيوتن</output></label><input type="range" id="fL" min="0" max="100" step="10" value="40" aria-label="قوة مريم"></div>
+  <div class="slider"><label>قوة سارة (تدفع لليسار) <output id="oR">40 نيوتن</output></label><input type="range" id="fR" min="0" max="100" step="10" value="40" aria-label="قوة سارة"></div>
+  <div class="fb info" id="net"></div>
+  <button class="btn alt" type="button" id="go">شاهدي ماذا يحدث</button>
+  <div class="tablebox"><table><thead><tr><th>المهمة</th><th>الحالة</th></tr></thead><tbody>
+   <tr data-t="bal"><td>اجعلي الصندوق يبقى ساكناً والقوتان ليستا صفراً</td><td class="empty">—</td></tr>
+   <tr data-t="move"><td>اجعلي الصندوق يتحرك نحو اليمين</td><td class="empty">—</td></tr></tbody></table></div>
+  <div id="s2q"></div></section>`);
+  main.append(card);card.scrollIntoView({behavior:"smooth",block:"start"});
+  const s=sv("svg",{viewBox:"0 0 400 130",role:"img","aria-label":"صندوق تؤثر فيه قوتان"},$("#box",card));
+  sv("rect",{x:0,y:100,width:400,height:30,fill:"#a8a29e"},s);
+  const g=sv("g",{},s);
+  sv("rect",{x:175,y:50,width:50,height:50,rx:4,fill:"#b45309",stroke:"#78350f","stroke-width":2},g);
+  const aL=sv("g",{},g),aR=sv("g",{},g);
+  const tL=sv("text",{x:120,y:40,"text-anchor":"middle","font-size":12,fill:"var(--ink)"},g),tR=sv("text",{x:280,y:40,"text-anchor":"middle","font-size":12,fill:"var(--ink)"},g);
+  const netA=sv("g",{},s);
+  let off=0;
+  function arrow(gr,x0,len,dir,col){gr.replaceChildren();if(!len)return;const x1=x0+dir*len;sv("line",{x1:x0,y1:75,x2:x1-dir*8,y2:75,stroke:col,"stroke-width":7},gr);sv("path",{d:`M${x1} 75 L${x1-dir*14} 66 L${x1-dir*14} 84 Z`,fill:col},gr)}
+  function draw(){
+    const L=+$("#fL",card).value,R=+$("#fR",card).value,N=L-R;
+    $("#oL",card).textContent=L+" نيوتن";$("#oR",card).textContent=R+" نيوتن";
+    arrow(aL,175-L*0.9-4,L*0.9,1,"#c2410c");arrow(aR,225+R*0.9+4,R*0.9,-1,"#0f6e8c");
+    tL.textContent=L?L+" ن":"";tR.textContent=R?R+" ن":"";
+    netA.replaceChildren();
+    const box=$("#net",card);
+    if(N===0)box.innerHTML=`القوة المحصلة = ${L} − ${R} = <b>صفر</b> ← القوتان <b>متزنتان</b>`;
+    else box.innerHTML=`القوة المحصلة = ${Math.abs(N)} نيوتن نحو ${N>0?"اليمين":"اليسار"} ← القوتان <b>غير متزنتين</b>`;
+  }
+  ["fL","fR"].forEach(id=>$("#"+id,card).oninput=()=>{SFX.tick();draw()});draw();
+  const done=new Set();
+  $("#go",card).onclick=async()=>{
+    const L=+$("#fL",card).value,R=+$("#fR",card).value,N=L-R;const btn=$("#go",card);btn.disabled=true;
+    const fb=$("#net",card);
+    if(N===0){
+      for(let i=0;i<6;i++){g.setAttribute("transform",`translate(${i%2?2:-2},0)`);await sleep(80)}g.setAttribute("transform","");
+      fb.innerHTML+=`<br>لم يتحرك الصندوق: القوتان ألغت إحداهما أثر الأخرى.`;
+      if(L>0)mark("bal");
+    }else{
+      SFX.whoosh();const dir=N>0?1:-1;let v=0;
+      for(let i=0;i<30;i++){v+=Math.abs(N)*0.004;off+=dir*v;g.setAttribute("transform",`translate(${Math.max(-160,Math.min(160,off))},0)`);await sleep(30)}
+      fb.innerHTML+=`<br>تحرّك الصندوق نحو ${dir>0?"اليمين":"اليسار"} وتزايدت سرعته: قوة محصلة ← <b>تسارع</b>.`;
+      off=0;await sleep(500);g.setAttribute("transform","");
+      if(dir>0)mark("move");
+    }
+    btn.disabled=false;
+  };
+  function mark(k){if(done.has(k))return;done.add(k);SFX.good();const c=card.querySelector(`tr[data-t="${k}"] td:last-child`);c.textContent="تمّت ✓";c.classList.remove("empty");if(done.size===2)ask()}
+  async function ask(){
+    $("#go",card).disabled=true;card.querySelectorAll("input").forEach(i=>i.disabled=true);
+    const q=$("#s2q",card);q.style.cssText="display:flex;flex-direction:column;gap:10px";
+    await mcq(q,{q:"إذا ألغت القوى بعضها أثر بعض فإن القوى تُعدّ:",opts:[{t:"متزنة",ok:true},{t:"غير متزنة",why:"غير المتزنة تحرّك الصندوق. حين بقي ساكناً كانت القوتان متزنتين."},{t:"قوة دفع فقط",why:"الدفع نوع من القوى، أما إلغاء القوى لبعضها فاسمه الاتزان."}],right:"صحيح. القوى المتزنة محصلتها صفر."});
+    await mcq(q,{q:"ماذا يحدث عندما تؤثر قوة محصلة في جسم؟",opts:[{t:"يتسارع الجسم",ok:true},{t:"يبقى الجسم ساكناً",why:"هذا يحدث حين تكون المحصلة صفراً."},{t:"يتحرك بسرعة ثابتة",why:"رأيتِ أن سرعة الصندوق كانت تتزايد."}],right:"صحيح. القوة المحصلة تُكسب الجسم تسارعاً."});
+    const n=el(`<button class="btn" type="button">التالي</button>`);q.append(n);n.onclick=()=>{n.remove();stage3()};
+  }
+  window.__s2=()=>{const L=$("#fL",card),R=$("#fR",card);return {L,R,go:$("#go",card)}};
+}
+
+// ============ Stage 3: friction ============
+function stage3(){
+  setSteps(2,TOTAL);
+  const card=el(`<section class="card"><h2>٣. الاحتكاك</h2>
+  <p>ادفعي الصندوق بالقوة نفسها على ثلاثة أسطح مختلفة، وقارني المسافة التي يقطعها قبل أن يتوقف.</p>
+  <div class="stage" id="fr"></div><div class="seg" id="surf"></div>
+  <div class="tablebox"><table><thead><tr><th>السطح</th><th>الخشونة</th><th>المسافة قبل التوقف</th></tr></thead><tbody id="ftb"></tbody></table></div>
+  <div id="s3q"></div></section>`);
+  main.append(card);card.scrollIntoView({behavior:"smooth",block:"start"});
+  const S=[{k:"ice",n:"جليد",r:"ناعم جداً",d:300,c:"#bfe3f5"},{k:"wood",n:"خشب",r:"متوسط",d:170,c:"#c08a55"},{k:"carpet",n:"سجاد",r:"خشن",d:70,c:"#7c3a52"}];
+  const s=sv("svg",{viewBox:"0 0 400 110",role:"img","aria-label":"صندوق ينزلق على سطح"},$("#fr",card));
+  const floor=sv("rect",{x:0,y:80,width:400,height:30,fill:"#a8a29e"},s);
+  const bx=sv("rect",{x:20,y:50,width:30,height:30,rx:3,fill:"#b45309"},s);
+  const tb=$("#ftb",card);S.forEach(x=>tb.append(el(`<tr data-s="${x.k}"><td>${x.n}</td><td>${x.r}</td><td class="empty">—</td></tr>`)));
+  const done=new Set();let busy=false;
+  S.forEach(x=>{const b=el(`<button type="button">${x.n}</button>`);b.onclick=async()=>{
+    if(busy)return;busy=true;floor.setAttribute("fill",x.c);bx.setAttribute("x",20);SFX.whoosh();
+    const t0=performance.now(),ms=900+x.d*3;
+    await new Promise(r=>{function f(n){const k=Math.min(1,(n-t0)/ms);const e=1-(1-k)*(1-k);bx.setAttribute("x",20+x.d*e);if(k<1)requestAnimationFrame(f);else r()}requestAnimationFrame(f)});
+    const c=tb.querySelector(`tr[data-s="${x.k}"] td:last-child`);c.textContent=Math.round(x.d/100*1.5*10)/10+" م";c.classList.remove("empty");
+    b.classList.add("tried");done.add(x.k);busy=false;if(done.size===3)ask()};$("#surf",card).append(b)});
+  async function ask(){
+    const q=$("#s3q",card);q.style.cssText="display:flex;flex-direction:column;gap:10px";
+    await mcq(q,{q:"على أي سطح كانت قوة الاحتكاك أكبر؟",opts:[{t:"السجاد",ok:true},{t:"الجليد",why:"على الجليد قطع الصندوق أطول مسافة، أي أن الاحتكاك كان أقل."},{t:"الخشب",why:"الصندوق توقف أسرع على سطح آخر."}],right:"صحيح. كلما كان السطح أخشن كانت قوة الاحتكاك أكبر."});
+    await mcq(q,{q:"القوة الممانعة التي تنشأ بين سطوح الأجسام المتلامسة هي:",opts:[{t:"قوة الاحتكاك",ok:true},{t:"القصور الذاتي",why:"القصور الذاتي ميل الجسم إلى الحفاظ على حالته، وليس قوة بين سطحين."},{t:"السرعة",why:"السرعة ليست قوة."}],right:"صحيح."});
+    await mcq(q,{q:"أيّ مما يلي قوة؟",opts:[{t:"الاحتكاك",ok:true},{t:"التسارع",why:"التسارع نتيجة للقوة، وليس قوة."},{t:"السرعة",why:"السرعة تصف الحركة، وليست قوة."},{t:"القصور الذاتي",why:"القصور الذاتي خاصية للجسم، وليس قوة."}],right:"صحيح. الاحتكاك قوة، ووحدة قياس القوة هي النيوتن."});
+    setSteps(3,TOTAL);
+    const b=el(`<button class="btn alt" type="button">احصلي على رمز الإنجاز</button>`);q.append(b);
+    b.onclick=()=>{setSteps(TOTAL,TOTAL);b.remove();const t=el(`<section class="card"></section>`);main.append(t);finish(t,CODE,[
+      "السرعة = المسافة ÷ الزمن، ووحدتها م/ث.",
+      "السرعة المتجهة: مقدار السرعة واتجاه الحركة معاً.",
+      "القوى المتزنة محصلتها صفر، فلا تغيّر حركة الجسم.",
+      "القوة المحصلة تجعل الجسم يتسارع.",
+      "الاحتكاك قوة ممانعة بين السطوح المتلامسة، ويزداد كلما زادت خشونة السطح."])};
+  }
+  window.__s3=()=>[...$("#surf",card).querySelectorAll("button")];
+}
+
+main.append(el(`<section class="card"><p>في هذا المعمل تقيسين السرعة، وتجرّبين القوى المتزنة وغير المتزنة، وتكتشفين أثر الاحتكاك.</p></section>`));
+stage1();
+window.__labstep=async()=>{
+  const trips=[...document.querySelectorAll("#trips button:not(.tried)")];
+  if(trips.length&&!document.querySelector("#s1q .opts:not(:has(.right))")){trips[0].click();await sleep(2600);return true}
+  if(window.__s2){const {L,R,go}=window.__s2();if(!go.disabled&&!L.disabled){
+    const set=(a,b)=>{L.value=a;R.value=b;L.dispatchEvent(new Event("input"))};
+    set(50,50);go.click();await sleep(700);set(80,20);go.click();await sleep(1800);return true}}
+  if(window.__s3){const bs=window.__s3().filter(b=>!b.classList.contains("tried"));if(bs.length){bs[0].click();await sleep(2200);return true}}
+  return false;
+};
+
+</script>

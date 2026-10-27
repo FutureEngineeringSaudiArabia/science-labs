@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>[hidden]{display:none!important}</style>
+<title>معمل قوانين نيوتن</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@500;700&family=IBM+Plex+Sans+Arabic:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#f3f1ec; --surface:#ffffff; --ink:#1f2328; --muted:#5d6570; --line:#d9d4c9;
+  --stage:#e8eef2; --accent:#0f6e8c; --accent-soft:#dcedf3; --warm:#c2410c; --warm-soft:#fde9dc;
+  --ok:#1f7a4d; --ok-soft:#dff1e7; --bad:#b42318; --bad-soft:#fbe4e1;
+  --acid:#d1344a; --base:#2b5fd9; --neutral:#2f9e5a; --water:#7fb8e6; --glass:#c9d6de;
+  --display:"Readex Pro","IBM Plex Sans Arabic",Tahoma,sans-serif;
+  --body:"IBM Plex Sans Arabic",Tahoma,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#14171b; --surface:#1c2026; --ink:#eceff3; --muted:#a3abb6; --line:#2e343c;
+  --stage:#1a242c; --accent:#5cc0e0; --accent-soft:#16323d; --warm:#ff8a4c; --warm-soft:#3b2116;
+  --ok:#5fd39a; --ok-soft:#173326; --bad:#ff8a7a; --bad-soft:#3a1d1a;
+  --acid:#ff6b7f; --base:#7aa2ff; --neutral:#5fd39a; --water:#3d6f99; --glass:#4a5863; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#14171b; --surface:#1c2026; --ink:#eceff3; --muted:#a3abb6; --line:#2e343c;
+  --stage:#1a242c; --accent:#5cc0e0; --accent-soft:#16323d; --warm:#ff8a4c; --warm-soft:#3b2116;
+  --ok:#5fd39a; --ok-soft:#173326; --bad:#ff8a7a; --bad-soft:#3a1d1a;
+  --acid:#ff6b7f; --base:#7aa2ff; --neutral:#5fd39a; --water:#3d6f99; --glass:#4a5863; color-scheme:dark}
+html{direction:rtl}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);font-size:16px;line-height:1.7}
+.wrap{max-width:860px;margin:0 auto;padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:16px}
+.wrap>header{display:flex;flex-direction:column;gap:4px;padding-inline-end:110px}
+.eyebrow{font-size:13px;color:var(--muted)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(24px,5vw,32px);line-height:1.3;margin:0;text-wrap:balance}
+.steps{display:flex;gap:6px;list-style:none;margin:6px 0 0;padding:0}
+.steps li{flex:1;height:6px;border-radius:3px;background:var(--line)}
+.steps li.done{background:var(--accent)}
+.steps li.now{background:var(--warm)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px}
+.card h2{font-family:var(--display);font-weight:500;font-size:20px;margin:0}
+.card h3{font-family:var(--display);font-weight:500;font-size:17px;margin:0}
+.card p{margin:0;max-width:68ch}
+.muted{color:var(--muted);font-size:14px}
+.stage{background:var(--stage);border-radius:10px;overflow:hidden;position:relative}
+.stage svg{display:block;width:100%;height:auto}
+.opts{display:grid;gap:8px}
+.opt{font:inherit;text-align:right;background:var(--bg);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:12px 14px;cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt.right{background:var(--ok-soft);border-color:var(--ok)}
+.opt.wrong{background:var(--bad-soft);border-color:var(--bad)}
+.opt[disabled]{cursor:default}
+button:focus-visible,.chip:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.btn{font:inherit;font-weight:600;background:var(--warm);color:#fff;border:0;border-radius:10px;padding:12px 18px;cursor:pointer;align-self:flex-start}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.alt{background:var(--accent)}
+.btn.ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.fb{border-radius:10px;padding:10px 14px;font-size:15px}
+.fb.ok{background:var(--ok-soft);color:var(--ok)}
+.fb.no{background:var(--bad-soft);color:var(--bad)}
+.fb.info{background:var(--accent-soft);color:var(--ink)}
+.done-card{border:2px solid var(--ok)}
+.code{font-family:var(--display);font-weight:700;font-size:44px;letter-spacing:.15em;direction:ltr;text-align:center;background:var(--ok-soft);color:var(--ok);border-radius:12px;padding:10px;font-variant-numeric:tabular-nums}
+ul.learned{margin:0;padding-inline-start:20px;display:grid;gap:4px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:inherit;font-size:15px;background:var(--surface);color:var(--ink);border:1.5px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--warm);background:var(--warm-soft)}
+.chip.placed{opacity:.35;cursor:default}
+.bins{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}
+.bin{font:inherit;text-align:right;background:var(--bg);color:var(--ink);border:2px dashed var(--line);border-radius:12px;padding:10px 12px;min-height:96px;display:flex;flex-direction:column;gap:6px;cursor:pointer}
+.bin b{font-family:var(--display);font-weight:500;font-size:15px}
+.bin .in{display:flex;flex-wrap:wrap;gap:4px}
+.bin .in span{font-size:13px;background:var(--ok-soft);color:var(--ok);border-radius:999px;padding:2px 10px}
+.bin.ready{border-color:var(--warm)}
+.tablebox{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:460px}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:right}
+th{font-weight:600;color:var(--muted);font-size:13px}
+td.empty{color:var(--muted)}
+.slider{display:flex;flex-direction:column;gap:4px}
+.slider label{font-size:14px;color:var(--muted);display:flex;justify-content:space-between;gap:8px}
+.slider output{font-variant-numeric:tabular-nums;color:var(--ink);font-weight:600}
+input[type=range]{width:100%;accent-color:var(--warm)}
+.seg{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:6px}
+.seg button{font:inherit;font-size:15px;background:var(--bg);color:var(--ink);border:1.5px solid var(--line);border-radius:10px;padding:8px 6px;cursor:pointer;line-height:1.35}
+.seg button small{display:block;color:var(--muted);font-size:12px}
+.seg button[aria-pressed="true"]{border-color:var(--warm);background:var(--warm-soft)}
+.seg button.tried{border-style:solid}
+.seg button.tried::after{content:" ✓";color:var(--ok);font-size:12px}
+.order{display:grid;gap:6px;counter-reset:n;padding:0;margin:0;list-style:none}
+.order li{background:var(--ok-soft);color:var(--ok);border-radius:10px;padding:8px 12px;counter-increment:n}
+.order li::before{content:counter(n) ". ";font-weight:700}
+.order li.slot{background:var(--bg);color:var(--muted);border:1.5px dashed var(--line)}
+.order li.slot::before{color:var(--muted)}
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01s!important;transition-duration:.01s!important}}
+
+table{min-width:0}
+</style>
+<div class="wrap">
+<header><span class="eyebrow">معمل افتراضي · أول متوسط · الحركة والقوة</span><h1>قوانين نيوتن الثلاثة</h1><ul class="steps" id="steps" aria-hidden="true"></ul></header>
+<main id="main" style="display:flex;flex-direction:column;gap:16px"></main>
+</div>
+<style>
+.fxglow{position:fixed;inset:0;pointer-events:none;z-index:30;opacity:0}
+.fxglow.ok{box-shadow:inset 0 0 0 6px #2fbf71,inset 0 0 90px 30px rgba(47,191,113,.55);animation:fxg 1s ease-out}
+.fxglow.no{box-shadow:inset 0 0 0 6px #e5484d,inset 0 0 90px 30px rgba(229,72,77,.45);animation:fxg .8s ease-out}
+@keyframes fxg{0%{opacity:0}15%{opacity:1}100%{opacity:0}}
+.fxbadge{position:fixed;left:50%;top:40%;z-index:31;pointer-events:none;font-family:var(--display);font-weight:700;font-size:42px;color:#fff;background:#1f9d5c;padding:8px 30px;border-radius:999px;opacity:0;transform:translate(-50%,-50%) scale(.6)}
+.fxbadge.show{animation:fxb 1.1s ease-out}
+@keyframes fxb{0%{opacity:0;transform:translate(-50%,-50%) scale(.6)}20%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}35%{transform:translate(-50%,-50%) scale(1)}75%{opacity:1}100%{opacity:0;transform:translate(-50%,-50%) scale(1)}}
+@media (prefers-reduced-motion:reduce){.fxbadge.show{animation:none;opacity:0}.fxglow.ok,.fxglow.no{animation-duration:.01s}}
+.wrap>header{padding-inline-end:110px}
+.sndbtn{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:calc(10px + env(safe-area-inset-left,0px));z-index:20;font:inherit;font-size:14px;background:var(--surface);color:var(--ink);border:1.5px solid var(--line);border-radius:999px;padding:6px 14px;cursor:pointer}
+.sndbtn:focus-visible{outline:3px solid var(--plate);outline-offset:2px}
+</style>
+<button class="sndbtn" id="sndbtn" aria-pressed="true">الصوت: يعمل</button>
+<script>
+const SFX=(()=>{
+  let ac=null,on=true;
+  const btn=document.getElementById("sndbtn");
+  btn.onclick=()=>{on=!on;btn.setAttribute("aria-pressed",on);btn.textContent=on?"الصوت: يعمل":"الصوت: متوقف";};
+  const A=()=>{if(!on)return null;try{if(!ac)ac=new (window.AudioContext||window.webkitAudioContext)();if(ac.state==="suspended")ac.resume();return ac}catch(e){return null}};
+  function tone(f,t0,d,type,vol,f2){const c=A();if(!c)return;const o=c.createOscillator(),g=c.createGain();o.type=type||"sine";o.frequency.setValueAtTime(f,c.currentTime+t0);if(f2)o.frequency.exponentialRampToValueAtTime(f2,c.currentTime+t0+d);g.gain.setValueAtTime(0,c.currentTime+t0);g.gain.linearRampToValueAtTime(vol||.2,c.currentTime+t0+.02);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t0+d);o.connect(g).connect(c.destination);o.start(c.currentTime+t0);o.stop(c.currentTime+t0+d+.05)}
+  function noise(t0,d,vol,fType,fFreq,fEnd){const c=A();if(!c)return;const n=c.sampleRate*d,b=c.createBuffer(1,n,c.sampleRate),x=b.getChannelData(0);for(let i=0;i<n;i++)x[i]=Math.random()*2-1;const s=c.createBufferSource();s.buffer=b;const f=c.createBiquadFilter();f.type=fType||"lowpass";f.frequency.setValueAtTime(fFreq||800,c.currentTime+t0);if(fEnd)f.frequency.exponentialRampToValueAtTime(fEnd,c.currentTime+t0+d);const g=c.createGain();g.gain.setValueAtTime(vol||.3,c.currentTime+t0);g.gain.exponentialRampToValueAtTime(.001,c.currentTime+t0+d);s.connect(f).connect(g).connect(c.destination);s.start(c.currentTime+t0)}
+  const fx=document.createElement("div");fx.className="fxglow";fx.setAttribute("aria-hidden","true");document.body.append(fx);
+  const badge=document.createElement("div");badge.className="fxbadge";badge.setAttribute("aria-hidden","true");badge.textContent="ممتاز";document.body.append(badge);
+  function glow(kind){fx.className="fxglow";badge.className="fxbadge";void fx.offsetWidth;fx.className="fxglow "+kind;if(kind==="ok"){void badge.offsetWidth;badge.className="fxbadge show"}}
+  const ding=()=>{tone(1318,0,.7,"sine",.22);tone(2637,0,.35,"sine",.06)};
+  const buzz=()=>{tone(150,0,.28,"square",.07,120)};
+  return{
+    good(){glow("ok");ding()},
+    bad(){glow("no");buzz()},
+    win(){glow("ok");ding();setTimeout(()=>tone(1568,0,.8,"sine",.2),220)},
+    tick(){tone(880,0,.08,"sine",.1)},
+    rumble(d,vol){noise(0,d||2,vol||.5,"lowpass",140,60)},
+    boom(){noise(0,2.5,1,"lowpass",900,40);tone(70,0,1.4,"sine",.6,30)},
+    bubble(){for(let i=0;i<10;i++)tone(300+Math.random()*500,i*.12+Math.random()*.05,.08,"sine",.07,700+Math.random()*400)},
+    hiss(d){noise(0,d||1.5,.15,"highpass",3000)},
+    whoosh(){noise(0,.6,.25,"bandpass",400,2400)},
+    thud(){tone(110,0,.25,"sine",.35,50)},
+  };
+})();
+</script>
+<script>
+// Shared helpers for all labs
+const $=(s,r=document)=>r.querySelector(s);
+const el=(html)=>{const t=document.createElement("template");t.innerHTML=html.trim();return t.content.childElementCount===1?t.content.firstElementChild:t.content};
+const shuffle=(a)=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const sleep=(ms)=>new Promise(r=>setTimeout(r,ms));
+const SVGNS="http://www.w3.org/2000/svg";
+function sv(tag,attrs,parent){const e=document.createElementNS(SVGNS,tag);for(const k in attrs)e.setAttribute(k,attrs[k]);if(parent)parent.append(e);return e}
+
+// Step bar
+function setSteps(n,total){const ul=$("#steps");ul.replaceChildren();for(let i=0;i<total;i++){const li=document.createElement("li");if(i<n)li.className="done";else if(i===n)li.className="now";ul.append(li)}}
+
+// Multiple-choice: must reach the right answer to continue. Returns promise resolved on correct.
+// opts: [{t:"text", ok:true/false, why:"explanation"}]
+function mcq(host,{q,opts,right,doShuffle=true}){
+  return new Promise(res=>{
+    const box=el(`<div class="opts" role="group"></div>`);
+    const fb=el(`<div class="fb" role="status" hidden></div>`);
+    if(q)host.append(el(`<p><b>${q}</b></p>`));
+    host.append(box,fb);
+    const list=doShuffle?shuffle(opts):opts;
+    let tries=0;
+    list.forEach(o=>{
+      const b=el(`<button class="opt" type="button">${o.t}</button>`);
+      b.onclick=()=>{
+        if(o.ok){
+          box.querySelectorAll(".opt").forEach(x=>x.disabled=true);
+          b.classList.add("right");fb.hidden=false;fb.className="fb ok";fb.textContent=right||o.why||"إجابة صحيحة.";SFX.good();res(tries)
+        }else{
+          tries++;b.classList.add("wrong");b.disabled=true;fb.hidden=false;fb.className="fb no";fb.textContent=o.why||"ليست هذه. فكّري مرة أخرى.";SFX.bad()
+        }
+      };
+      box.append(b);
+    });
+  });
+}
+
+// Tap-to-classify: pick a chip then a bin. items:[{t, bin, why}] bins:[{id,label,hint}]
+function classify(host,{items,bins,onPick}){
+  return new Promise(res=>{
+    const chips=el(`<div class="chips" aria-label="البطاقات"></div>`);
+    const binsEl=el(`<div class="bins"></div>`);
+    const fb=el(`<div class="fb info" role="status">اختاري بطاقة، ثم اختاري المجموعة المناسبة لها.</div>`);
+    host.append(chips,binsEl,fb);
+    let sel=null,left=items.length;
+    const binBtns={};
+    bins.forEach(b=>{
+      const bb=el(`<button class="bin" type="button"><b>${b.label}</b>${b.hint?`<span class="muted">${b.hint}</span>`:""}<span class="in"></span></button>`);
+      bb.onclick=()=>{
+        if(!sel){fb.className="fb info";fb.textContent="اختاري بطاقة أولاً.";return}
+        const it=sel.item;
+        if(it.bin===b.id){
+          bb.querySelector(".in").append(el(`<span>${it.t}</span>`));
+          sel.btn.classList.add("placed");sel.btn.disabled=true;sel.btn.setAttribute("aria-pressed","false");
+          fb.className="fb ok";fb.textContent=it.why||"صحيح.";SFX.good();sel=null;left--;
+          Object.values(binBtns).forEach(x=>x.classList.remove("ready"));
+          if(left===0)res();
+        }else{
+          fb.className="fb no";fb.textContent=it.hintWrong||"ليست هذه المجموعة. انظري إلى المادة مرة أخرى.";SFX.bad();
+        }
+      };
+      binBtns[b.id]=bb;binsEl.append(bb);
+    });
+    shuffle(items).forEach(it=>{
+      const c=el(`<button class="chip" type="button" aria-pressed="false">${it.t}</button>`);
+      c.onclick=()=>{
+        chips.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed","false"));
+        c.setAttribute("aria-pressed","true");sel={item:it,btn:c};SFX.tick();
+        Object.values(binBtns).forEach(x=>x.classList.add("ready"));
+        fb.className="fb info";fb.textContent="«"+it.t+"»: إلى أي مجموعة تنتمي؟";
+        if(onPick)onPick(it);
+      };
+      chips.append(c);
+    });
+  });
+}
+
+// Final screen with code
+function finish(task,code,learned){
+  SFX.win();
+  task.classList.add("done-card");
+  task.replaceChildren(el(`<div><h2>أنهيتِ المعمل</h2><p>رمز الإنجاز الخاص بهذا المعمل:</p><div class="code">${code}</div><p>عودي إلى النموذج واكتبي هذا الرمز، ثم أجيبي عن السؤال.</p><h2 style="margin-top:12px">ما تعلمتِه</h2><ul class="learned">${learned.map(x=>`<li>${x}</li>`).join("")}</ul></div>`));
+  task.scrollIntoView({behavior:"smooth",block:"start"});
+}
+
+</script>
+<script>
+const CODE="5629";
+const main=$("#main");
+const TOTAL=4;
+
+// ============ Stage 1: Newton 1 & 2 ============
+function stage1(){
+  setSteps(0,TOTAL);
+  const card=el(`<section class="card"><h2>١. القانونان الأول والثاني</h2>
+  <p>ادفعي العربتين بالقوة نفسها (50 نيوتن). العربة الأولى فارغة، والثانية محمّلة بالصناديق. أيهما تتسارع أكثر؟</p>
+  <div class="stage" id="carts"></div>
+  <button class="btn alt" type="button" id="push">ادفعي العربتين</button>
+  <div id="s1q"></div></section>`);
+  main.append(card);
+  const s=sv("svg",{viewBox:"0 0 400 150",role:"img","aria-label":"عربتان إحداهما فارغة والأخرى محمّلة"},$("#carts",card));
+  sv("rect",{x:0,y:62,width:400,height:4,fill:"#a8a29e"},s);sv("rect",{x:0,y:136,width:400,height:4,fill:"#a8a29e"},s);
+  function cart(y,load){const g=sv("g",{},s);sv("rect",{x:20,y:y-22,width:56,height:16,rx:3,fill:"#0f6e8c"},g);
+    sv("circle",{cx:32,cy:y-4,r:6,fill:"#1f2328"},g);sv("circle",{cx:64,cy:y-4,r:6,fill:"#1f2328"},g);
+    if(load)for(let i=0;i<3;i++)for(let j=0;j<2;j++)sv("rect",{x:24+i*17,y:y-40-j*16,width:15,height:15,fill:"#b45309",stroke:"#78350f"},g);
+    const t=sv("text",{x:48,y:y+14,"text-anchor":"middle","font-size":11,fill:"var(--ink)"},g);t.textContent=load?"كتلة 50 كجم":"كتلة 10 كجم";return g}
+  const c1=cart(62,false),c2=cart(136,true);
+  $("#push",card).onclick=async(e)=>{e.target.remove();SFX.whoosh();
+    for(let i=0;i<=40;i++){const k=i/40;c1.setAttribute("transform",`translate(${300*k*k},0)`);c2.setAttribute("transform",`translate(${60*k*k},0)`);await sleep(30)}
+    const q=$("#s1q",card);q.style.cssText="display:flex;flex-direction:column;gap:10px";
+    await mcq(q,{q:"أيّ العربتين اكتسبت تسارعاً أكبر؟",opts:[{t:"العربة الفارغة (كتلتها أقل)",ok:true},{t:"العربة المحمّلة",why:"راقبي المسافة: العربة المحمّلة تحركت ببطء لأن كتلتها كبيرة."},{t:"تسارعتا بالمقدار نفسه",why:"القوة واحدة لكن الكتلتين مختلفتان، فالتسارع مختلف."}],right:"صحيح. هذا هو قانون نيوتن الثاني: القوة نفسها تُكسب الجسم الأقل كتلة تسارعاً أكبر (ق = ك × ت)."});
+    q.append(el(`<h3 style="margin-top:6px">القانون الأول: القصور الذاتي</h3><p>كانت لينا تجلس في سيارة متحركة، فتوقفت السيارة فجأة.</p>`));
+    await mcq(q,{q:"ماذا يحدث لجسم لينا؟",opts:[{t:"يندفع إلى الأمام؛ لأنه يميل إلى الاستمرار في حركته",ok:true},{t:"يندفع إلى الخلف",why:"جسمها كان يتحرك للأمام، فيميل إلى الاستمرار في الحركة للأمام."},{t:"لا يتأثر",why:"الجسم المتحرك يقاوم التغير في حركته، لذلك نربط حزام الأمان."}],right:"صحيح. هذا هو القصور الذاتي: الجسم يبقى على حالته من سكون أو حركة ما لم تؤثر فيه قوة محصلة."});
+    const n=el(`<button class="btn" type="button">التالي</button>`);q.append(n);n.onclick=()=>{n.remove();stage2()};
+  };
+}
+
+// ============ Stage 2: action-reaction with a balloon rocket ============
+function stage2(){
+  setSteps(1,TOTAL);
+  const card=el(`<section class="card"><h2>٢. صاروخ البالون: الفعل ورد الفعل</h2>
+  <p>بالون منفوخ مربوط بقشّة تنزلق على خيط مشدود. انفخي البالون، ثم أفلتيه، وراقبي اتجاه الهواء واتجاه البالون.</p>
+  <div class="stage" id="bal"></div>
+  <div class="slider"><label>كمية الهواء في البالون <output id="oA">قليلة</output></label><input type="range" id="A" min="1" max="3" step="1" value="1" aria-label="كمية الهواء"></div>
+  <button class="btn alt" type="button" id="go">أفلتي البالون</button>
+  <div class="tablebox"><table><thead><tr><th>كمية الهواء</th><th>اتجاه الهواء</th><th>اتجاه البالون</th><th>المسافة</th></tr></thead><tbody id="btb"></tbody></table></div>
+  <div id="s2q"></div></section>`);
+  main.append(card);card.scrollIntoView({behavior:"smooth",block:"start"});
+  const s=sv("svg",{viewBox:"0 0 400 175",role:"img","aria-label":"بالون على خيط يندفع منه الهواء"},$("#bal",card));
+  sv("line",{x1:10,y1:60,x2:390,y2:60,stroke:"#64748b","stroke-width":2},s);
+  sv("rect",{x:4,y:40,width:8,height:110,fill:"#78716c"},s);sv("rect",{x:388,y:40,width:8,height:110,fill:"#78716c"},s);
+  const ar=sv("g",{},s),air=sv("g",{},s),bg=sv("g",{},s);
+  const NM={1:"قليلة",2:"متوسطة",3:"كثيرة"};
+  function balloon(x,size){bg.replaceChildren();const rx=18+size*7,ry=13+size*5;
+    sv("rect",{x:x-20,y:56,width:40,height:8,rx:3,fill:"#e2e8f0",stroke:"#94a3b8"},bg);
+    sv("ellipse",{cx:x,cy:60+ry*0.2,rx,ry,fill:"#e11d48",opacity:.9},bg);
+    sv("path",{d:`M${x-rx} ${60+ry*0.2} l-8 -5 l0 10 Z`,fill:"#be123c"},bg);return rx}
+  let size=1;balloon(70,size);
+  $("#A",card).oninput=e=>{size=+e.target.value;$("#oA",card).textContent=NM[size];ar.replaceChildren();air.replaceChildren();balloon(70,size);SFX.tick()};
+  const done=new Set();
+  function arrow(x0,x1,y,col,txt){const d=Math.sign(x1-x0);sv("line",{x1:x0,y1:y,x2:x1-d*10,y2:y,stroke:col,"stroke-width":6},ar);sv("path",{d:`M${x1} ${y} L${x1-d*14} ${y-8} L${x1-d*14} ${y+8} Z`,fill:col},ar);const t=sv("text",{x:200,y:y+(y<120?-12:22),"text-anchor":"middle","font-size":12,"font-weight":700,fill:col},ar);t.textContent=txt}
+  $("#go",card).onclick=async()=>{
+    const btn=$("#go",card);btn.disabled=true;$("#A",card).disabled=true;ar.replaceChildren();air.replaceChildren();
+    const dist=[0,90,170,250][size];let x=70;const rx=balloon(x,size);
+    SFX.hiss(1.2);const N=30+size*10;
+    for(let i=0;i<N;i++){x+=dist/N;balloon(x,Math.max(0,size-i/N*size));
+      if(i%2===0){const p=sv("circle",{cx:x-rx-8,cy:60+(Math.random()-.5)*10,r:3,fill:"#93c5fd"},air);setTimeout(()=>p.remove(),500)}
+      air.querySelectorAll("circle").forEach(c=>c.setAttribute("cx",+c.getAttribute("cx")-6));await sleep(30)}
+    air.replaceChildren();
+    arrow(195,95,104,"#0f6e8c","الفعل: البالون يدفع الهواء للخلف");
+    arrow(205,305,138,"#e11d48","رد الفعل: الهواء يدفع البالون للأمام");
+    if(!done.has(size)){done.add(size);$("#btb",card).append(el(`<tr><td>${NM[size]}</td><td>إلى الخلف ←</td><td>→ إلى الأمام</td><td>${[0,"قصيرة","متوسطة","طويلة"][size]}</td></tr>`))}
+    SFX.thud();
+    if(done.size>=2)ask();else{const f=el(`<p class="muted">غيّري كمية الهواء وجرّبي مرة أخرى.</p>`);$("#s2q",card).replaceChildren(f);
+      await sleep(400);btn.disabled=false;$("#A",card).disabled=false;}
+  };
+  let asked=false;
+  async function ask(){if(asked)return;asked=true;
+    const q=$("#s2q",card);q.replaceChildren();q.style.cssText="display:flex;flex-direction:column;gap:10px";
+    q.append(el(`<div class="fb info"><b>الفعل:</b> البالون يدفع الهواء إلى الخلف.<br><b>رد الفعل:</b> الهواء يدفع البالون إلى الأمام بقوة مساوية ومعاكسة.</div>`));
+    await mcq(q,{q:"لماذا تحرّك البالون إلى الأمام؟",opts:[
+      {t:"لأن الهواء الخارج دفعه بقوة رد فعل",ok:true},{t:"لأن الخيط سحبه",why:"الخيط يوجّه البالون فقط ولا يدفعه."},{t:"لأن البالون خفيف",why:"الخفة لا تحرّك شيئاً. البالون تحرّك لأن قوة دفعته."}],right:"صحيح. هذا قانون نيوتن الثالث."});
+    q.append(el(`<p><b>اختاري رد الفعل المناسب لكل فعل:</b></p>`));
+    await mcq(q,{q:"🚶‍♀️ وأنتِ تمشين، تدفع قدمك الأرض إلى الخلف. رد الفعل:",opts:[{t:"الأرض تدفع قدمك إلى الأمام",ok:true},{t:"الأرض تدفع قدمك إلى الخلف",why:"رد الفعل معاكس للفعل في الاتجاه."},{t:"لا يوجد رد فعل",why:"لكل فعل رد فعل. لولا دفع الأرض لما استطعتِ المشي."}],right:"صحيح. لهذا يصعب المشي على الجليد الأملس."});
+    await mcq(q,{q:"🚣‍♀️ يدفع المجداف الماء إلى الخلف. رد الفعل:",opts:[{t:"الماء يدفع القارب إلى الأمام",ok:true},{t:"الماء يدفع القارب إلى الخلف",why:"رد الفعل معاكس: الماء دُفع للخلف، فيدفع القارب للأمام."},{t:"القارب يدفع الماء إلى الأمام",why:"هذا ليس رد الفعل. فكّري: ماذا يفعل الماء بالقارب؟"}],right:"صحيح."});
+    await mcq(q,{q:"🚀 يدفع الصاروخ الغازات إلى الأسفل. رد الفعل:",opts:[{t:"الغازات تدفع الصاروخ إلى الأعلى",ok:true},{t:"الغازات تدفع الصاروخ إلى الأسفل",why:"رد الفعل معاكس للفعل."},{t:"الهواء يسحب الصاروخ",why:"الصاروخ يرتفع لأن الغازات تدفعه، حتى في الفضاء حيث لا هواء."}],right:"صحيح، تماماً مثل البالون."});
+    const n=el(`<button class="btn" type="button">التالي</button>`);q.append(n);n.onclick=()=>{n.remove();stage3()};
+  }
+  window.__s2b=()=>({A:$("#A",card),go:$("#go",card)});
+}
+
+// ============ Stage 3: why they don't cancel ============
+async function stage3(){
+  setSteps(2,TOTAL);
+  const card=el(`<section class="card"><h2>٣. لماذا لا يلغي الفعلُ ردَّ الفعل؟</h2>
+  <p>قارني بين الحالتين:</p>
+  <div class="stage" id="cmp"></div></section>`);
+  main.append(card);card.scrollIntoView({behavior:"smooth",block:"start"});
+  const s=sv("svg",{viewBox:"0 0 400 190",role:"img","aria-label":"مقارنة بين قوتين على جسم واحد وقوتين على جسمين"},$("#cmp",card));
+  const T=(x,y,t,sz,col)=>{const e=sv("text",{x,y,"text-anchor":"middle","font-size":sz||12,"font-weight":700,fill:col||"var(--ink)"},s);e.textContent=t};
+  const A=(x0,x1,y,col)=>{const d=Math.sign(x1-x0);sv("line",{x1:x0,y1:y,x2:x1-d*8,y2:y,stroke:col,"stroke-width":5},s);sv("path",{d:`M${x1} ${y} L${x1-d*12} ${y-7} L${x1-d*12} ${y+7} Z`,fill:col},s)};
+  T(100,20,"أ) قوتان على جسم واحد");sv("rect",{x:80,y:60,width:40,height:40,fill:"#b45309"},s);A(80,30,80,"#0f6e8c");A(120,170,80,"#c2410c");T(100,130,"تلغي إحداهما الأخرى",11,"var(--ok)");T(100,148,"(قوتان متزنتان)",11,"var(--muted)");
+  sv("line",{x1:200,y1:10,x2:200,y2:180,stroke:"var(--line)","stroke-width":2,"stroke-dasharray":"4 4"},s);
+  T(300,20,"ب) فعل ورد فعل");sv("ellipse",{cx:330,cy:80,rx:26,ry:18,fill:"#e11d48"},s);[[262,72],[250,86],[270,92],[240,76]].forEach(([x,y])=>sv("circle",{cx:x,cy:y,r:7,fill:"#93c5fd"},s));
+  T(255,115,"الهواء",11);T(330,115,"البالون",11);A(300,350,62,"#e11d48");A(300,232,100,"#0f6e8c");T(300,140,"لا تلغي إحداهما الأخرى",11,"var(--bad)");T(300,158,"كل قوة على جسم مختلف",11,"var(--muted)");
+  const q=el(`<div style="display:flex;flex-direction:column;gap:10px"></div>`);card.append(q);
+  await mcq(q,{q:"لماذا لا تلغي قوتا الفعل ورد الفعل إحداهما الأخرى؟",opts:[
+    {t:"لأنهما تؤثران في جسمين مختلفين",ok:true},
+    {t:"لأنهما متساويتان في المقدار ومتعاكستان في الاتجاه",why:"هذا وصف صحيح للقوتين، لكنه ليس السبب. القوتان المتزنتان أيضاً متساويتان ومتعاكستان، والفرق أن الفعل ورد الفعل يؤثران في جسمين مختلفين."},
+    {t:"لأنهما في الاتجاه نفسه",why:"الفعل ورد الفعل متعاكسان في الاتجاه دائماً."},
+    {t:"لأنهما قوتان غير متزنتين",why:"الاتزان يُقاس على جسم واحد. الفعل ورد الفعل لا يجتمعان على جسم واحد أصلاً."}],right:"صحيح. القوتان تلغي إحداهما الأخرى فقط إذا أثّرتا في الجسم نفسه."});
+  await mcq(q,{q:"أكملي قانون نيوتن الثالث: لكل قوة فعل قوة رد فعل مساوية لها في ……… ومعاكسة لها في ………",opts:[
+    {t:"المقدار / الاتجاه",ok:true},{t:"الاتجاه / المقدار",why:"رد الفعل يساوي الفعل في المقدار، ويعاكسه في الاتجاه."},{t:"الكتلة / السرعة",why:"القانون يتحدث عن القوة: مقدارها واتجاهها."}],right:"صحيح."});
+  setSteps(3,TOTAL);
+  const b=el(`<button class="btn alt" type="button">احصلي على رمز الإنجاز</button>`);q.append(b);
+  b.onclick=()=>{setSteps(TOTAL,TOTAL);b.remove();const t=el(`<section class="card"></section>`);main.append(t);finish(t,CODE,[
+    "القانون الأول: الجسم يبقى ساكناً أو متحركاً بسرعة ثابتة ما لم تؤثر فيه قوة محصلة (القصور الذاتي).",
+    "القانون الثاني: القوة نفسها تُكسب الجسم الأقل كتلة تسارعاً أكبر (ق = ك × ت).",
+    "القانون الثالث: لكل فعل رد فعل مساوٍ له في المقدار ومعاكس له في الاتجاه.",
+    "الفعل ورد الفعل لا يلغي أحدهما الآخر لأنهما يؤثران في جسمين مختلفين."])};
+}
+
+main.append(el(`<section class="card"><p>في هذا المعمل تجرّبين قوانين نيوتن الثلاثة، وتكتشفين سرّ الفعل ورد الفعل.</p></section>`));
+stage1();
+window.__labstep=async()=>{if(window.__s2b){const {A,go}=window.__s2b();if(!go.disabled&&go.isConnected&&!document.querySelector("#s2q .opts")){A.value=A.value=="1"?"3":"1";A.dispatchEvent(new Event("input"));go.click();await sleep(2600);return true}}const p=document.getElementById("push");if(p){p.click();await sleep(2800);return true}return false};
+
+</script>
